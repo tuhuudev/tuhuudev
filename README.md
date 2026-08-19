@@ -1,13 +1,13 @@
 # Hi, I'm Tu Nguyen 👋
 
-**Senior Front-end Developer** — 7+ years building web & mobile products across **travel, fintech, and crypto**.
+**Front-end Developer** — building web products across **travel, fintech, and crypto**. Currently exploring applied AI engineering.
 
 Currently building ticketing & booking systems for the travel & hospitality industry: interactive **seat maps with real-time hold/release**, full booking flows (search → checkout → order states), and third-party supplier integrations (KKday, CiAPS) — shipped on both an OTA web platform and a super-app webview.
 
 ## 🔧 Stack
 
 - **Front-end:** React · Next.js · React Native · Angular · TypeScript
-- **State:** Redux (Saga) · NgRx · Hooks/Context
+- **State:** Redux · NgRx · Hooks/Context
 - **Back-end (self-driven):** Next.js server actions · Node.js · Supabase (PostgreSQL) · Java Spring Boot
 - **Testing:** Vitest · JUnit 5 / MockMvc
 - **Workflow:** AI-assisted development (Claude Code) · Agile/Scrum · code review
