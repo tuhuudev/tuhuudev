@@ -18,7 +18,6 @@ Currently building ticketing & booking systems for the travel & hospitality indu
 |---|---|
 | [mega-shop](https://github.com/tuhuudev/mega-shop) | Full-stack e-commerce — Next.js 15 (App Router) + Supabase (PostgreSQL, RLS) + VNPay payment |
 | [shop-api](https://github.com/tuhuudev/shop-api) | Production-grade REST API — Spring Boot, JWT RS256 + RBAC, PostgreSQL + Flyway, Redis, CI |
-| [shop-client](https://github.com/tuhuudev/shop-client) | React + Vite + TypeScript client for shop-api — JWT auth, role-based UI, cart, orders, admin |
 | [AI Stack Builder](https://ai-stack-builder.pages.dev) | Live — interactive AI-tool recommender quiz for small businesses |
 | [AI Model Radar](https://ai-model-radar.pages.dev) | Live — AI model pricing & limits tracker, 500+ generated pages |
 
