@@ -1,6 +1,8 @@
 name: Deploy portfolio
 
-# Builds portfolio/ and publishes it with GitHub Pages at https://tuhuudev.github.io/tuhuudev/
+# Builds portfolio/ and publishes dist/ to the gh-pages branch.
+# GitHub Pages (Settings → Pages → Deploy from a branch → gh-pages) serves it at
+# https://tuhuudev.github.io/tuhuudev/
 on:
   push:
     branches: [main, claude/personal-portfolio-threejs-joqjx4]
@@ -8,42 +10,29 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: portfolio
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true # turns Pages on (source: GitHub Actions) if it isn't yet
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: portfolio/package-lock.json
       - run: npm ci
+        working-directory: portfolio
       - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
+        working-directory: portfolio
+      - run: touch portfolio/dist/.nojekyll
+      - uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: portfolio/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          folder: portfolio/dist
+          branch: gh-pages
+          clean: true
