@@ -13,8 +13,21 @@ the world height matching that section, so scrolling moves the camera through th
 | Projects | Floating polyhedra, one per project |
 | Contact | Torus knot made of glowing points |
 
-Also: bloom post-processing, mouse parallax, scroll-reveal, `prefers-reduced-motion` support,
-mobile layout, and a plain-HTML fallback when WebGL2 isn't available.
+## Performance & smoothness
+
+- **Code splitting** — page text is ~10 KB gzip and renders immediately; Three.js loads in a separate chunk.
+- **Lenis smooth scroll** driven from the same `requestAnimationFrame` as WebGL, so the 3D camera stays glued to the HTML.
+- **Adaptive quality** — a frame-time monitor steps down pixel ratio, then disables bloom, on slow devices.
+- **Half-resolution bloom**, no MSAA, fewer particles on mobile, off-screen scene culling.
+- Raycasting only when the pointer or scroll changed; frame-rate independent easing everywhere.
+- Rendering pauses when the tab is hidden.
+
+## Interaction
+
+- Hover a skill group card to light up those skills in the 3D cloud (and vice versa: hover a 3D label for a tooltip).
+- Intro animation, rotating role text, active-section nav + scroll progress bar.
+- 3D tilt + cursor glare on project cards, magnetic buttons, copy-email button.
+- Honors `prefers-reduced-motion`; plain-HTML fallback without WebGL2.
 
 ## Run locally
 
@@ -47,5 +60,6 @@ src/
 
 ## Deploy
 
-`.github/workflows/deploy-portfolio.yml` builds and publishes `portfolio/dist` to GitHub Pages on
-every push to `main` that touches `portfolio/`. Enable it once in **Settings → Pages → Source: GitHub Actions**.
+`.github/workflows/deploy-portfolio.yml` builds the site and pushes `dist/` to the `gh-pages` branch
+on every push that touches `portfolio/`. GitHub Pages serves it at **https://tuhuudev.github.io/tuhuudev/**.
+If the site doesn't appear, set **Settings → Pages → Source: Deploy from a branch → `gh-pages` / root** once.

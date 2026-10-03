@@ -6,6 +6,8 @@ export const profile = {
   role: 'Front-end Developer',
   tagline:
     'Building web products across travel, fintech and crypto. Currently exploring applied AI engineering.',
+  // Cycled under the name in the hero.
+  roles: ['Front-end Developer', 'React · Next.js · TypeScript', 'Booking & seat-map UIs', 'Exploring applied AI'],
   email: 'nguyenhuutu2898@gmail.com',
   links: [
     { label: 'GitHub', url: 'https://github.com/tuhuudev' },
@@ -111,4 +113,14 @@ export const projects = [
     url: 'https://ai-model-radar.pages.dev',
     linkLabel: 'Live site',
   },
+];
+
+// "Under the hood" — the techniques this site itself uses.
+export const siteTech = [
+  { name: 'Custom GLSL shaders', detail: 'Simplex-noise vertex displacement and fresnel shading on the hero core' },
+  { name: 'Scroll-synced WebGL', detail: 'One fixed canvas; each section owns a 3D scene placed at its exact page position' },
+  { name: 'Adaptive quality', detail: 'Frame-time monitor lowers pixel ratio and turns off bloom on slower devices' },
+  { name: 'Code splitting', detail: 'Page text renders first; Three.js loads in its own chunk afterwards' },
+  { name: 'Smooth scrolling', detail: 'Lenis inertial scroll driven from the same requestAnimationFrame as rendering' },
+  { name: 'Accessible fallbacks', detail: 'Honors prefers-reduced-motion and works without WebGL' },
 ];

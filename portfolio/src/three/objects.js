@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { simplexNoise } from './noise.js';
 import { createLabel } from './label.js';
 
+// Exponential smoothing factor that behaves the same at any frame rate.
+const ease = (dt, rate) => 1 - Math.exp(-dt * rate);
+
 // Every builder returns { group, update(time, ctx) } — `ctx` carries pointer + hover state.
 
 export function createStarfield(count = 2200) {
@@ -29,8 +32,9 @@ export function createStarfield(count = 2200) {
   const points = new THREE.Points(geometry, material);
   return {
     group: points,
-    update(t) {
+    update(t, ctx) {
       points.rotation.z = t * 0.01;
+      material.opacity = 0.8 * ctx.intro;
     },
   };
 }
@@ -117,14 +121,17 @@ export function createCore() {
     group,
     update(t, ctx) {
       uniforms.uTime.value = t;
-      const target = 0.35 + ctx.pointerSpeed * 0.6;
-      uniforms.uIntensity.value += (target - uniforms.uIntensity.value) * 0.05;
+      // Moving the mouse fast "excites" the core; the intro starts it highly distorted.
+      const target = 0.35 + ctx.pointerSpeed * 0.6 + (1 - ctx.intro) * 1.2;
+      uniforms.uIntensity.value += (target - uniforms.uIntensity.value) * ease(ctx.dt, 3);
+      group.scale.setScalar(0.4 + 0.6 * ctx.intro);
+      ring.rotation.x = 0.45 + (1 - ctx.intro) * 1.2;
       core.rotation.y = t * 0.15;
       shell.rotation.y = -t * 0.1;
       shell.rotation.x = t * 0.07;
       ring.rotation.y = t * 0.12;
-      group.rotation.x += (ctx.pointer.y * 0.25 - group.rotation.x) * 0.05;
-      group.rotation.y += (ctx.pointer.x * 0.35 - group.rotation.y) * 0.05;
+      group.rotation.x += (ctx.pointer.y * 0.25 - group.rotation.x) * ease(ctx.dt, 3);
+      group.rotation.y += (ctx.pointer.x * 0.35 - group.rotation.y) * ease(ctx.dt, 3);
     },
   };
 }
@@ -136,7 +143,7 @@ export function createSkillCloud(skills) {
   group.add(cloud);
 
   const items = skills.flatMap((s) => s.items.map((name) => ({ name, group: s.group, color: s.color })));
-  const radius = 2.5;
+  const radius = 2.35;
   const golden = Math.PI * (3 - Math.sqrt(5));
   const labels = items.map((item, i) => {
     const y = 1 - (i / (items.length - 1)) * 2;
@@ -166,12 +173,16 @@ export function createSkillCloud(skills) {
       cloud.updateMatrix();
       for (const label of labels) {
         const hovered = ctx.hovered === label;
-        const k = hovered ? 1.45 : 1;
-        label.scale.lerp(tmpScale.copy(label.userData.baseScale).multiplyScalar(k), 0.15);
+        const inGroup = ctx.highlightedGroup === label.userData.info.group;
+        const focus = hovered || inGroup;
+        const dimmed = (ctx.hovered || ctx.highlightedGroup) && !focus;
+        const k = hovered ? 1.4 : inGroup ? 1.2 : 1;
+        label.scale.lerp(tmpScale.copy(label.userData.baseScale).multiplyScalar(k), ease(ctx.dt, 10));
         // Fade labels on the far side of the sphere so the front reads clearly.
         const z = tmpPos.copy(label.position).applyMatrix4(cloud.matrix).z / radius;
         const depth = 0.25 + 0.75 * (z + 1) * 0.5;
-        label.material.opacity = hovered ? 1 : ctx.hovered ? depth * 0.5 : depth;
+        const target = focus ? 1 : dimmed ? depth * 0.3 : depth;
+        label.material.opacity += (target - label.material.opacity) * ease(ctx.dt, 10);
       }
     },
   };
@@ -230,8 +241,8 @@ export function createOrbits(experience) {
         m.label.position.copy(tmp);
         m.label.position.y += 0.3;
       }
-      group.rotation.y += (ctx.pointer.x * 0.4 - group.rotation.y) * 0.04;
-      group.rotation.x += (-ctx.pointer.y * 0.2 + 0.15 - group.rotation.x) * 0.04;
+      group.rotation.y += (ctx.pointer.x * 0.4 - group.rotation.y) * ease(ctx.dt, 2.4);
+      group.rotation.x += (-ctx.pointer.y * 0.2 + 0.15 - group.rotation.x) * ease(ctx.dt, 2.4);
     },
   };
 }
@@ -290,8 +301,8 @@ export function createProjectShapes(projects) {
         s.wire.rotation.copy(s.solid.rotation);
         s.holder.position.z = Math.sin(t + s.phase) * 0.3;
       }
-      group.rotation.y += (ctx.pointer.x * 0.3 - group.rotation.y) * 0.05;
-      group.rotation.x += (-ctx.pointer.y * 0.2 - group.rotation.x) * 0.05;
+      group.rotation.y += (ctx.pointer.x * 0.3 - group.rotation.y) * ease(ctx.dt, 3);
+      group.rotation.x += (-ctx.pointer.y * 0.2 - group.rotation.x) * ease(ctx.dt, 3);
     },
   };
 }
