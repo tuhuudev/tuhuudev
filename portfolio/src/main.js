@@ -1,6 +1,6 @@
 import './style.css';
 import Lenis from 'lenis';
-import { profile, skills, experience, projects, siteTech } from './data.js';
+import { profile, skills, experience, education, projects, siteTech } from './data.js';
 import { renderApp, esc } from './template.js';
 
 
@@ -11,7 +11,7 @@ function render() {
   // Production builds ship this HTML prerendered; dev renders it so data.js edits show up live.
   const app = document.getElementById('app');
   if (import.meta.env.DEV || !app.children.length) {
-    app.innerHTML = renderApp({ profile, skills, experience, projects, siteTech });
+    app.innerHTML = renderApp({ profile, skills, experience, education, projects, siteTech });
   }
 }
 

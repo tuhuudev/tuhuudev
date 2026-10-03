@@ -4,7 +4,7 @@
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-export function renderApp({ profile, skills, experience, projects, siteTech }) {
+export function renderApp({ profile, skills, experience, education, projects, siteTech }) {
   return `
     <section id="hero" class="section" data-scene="hero" data-side="right">
       <div class="content left">
@@ -12,6 +12,9 @@ export function renderApp({ profile, skills, experience, projects, siteTech }) {
         <h1 class="reveal">${esc(profile.name)}</h1>
         <p class="role reveal"><span class="role-text" aria-live="polite">${esc(profile.roles[0])}</span><span class="caret" aria-hidden="true"></span></p>
         <p class="lead reveal">${esc(profile.tagline)}</p>
+        <dl class="stats reveal">
+          ${profile.stats.map((s) => `<div><dt>${esc(s.value)}</dt><dd>${esc(s.label)}</dd></div>`).join('')}
+        </dl>
         <div class="actions reveal">
           <a class="btn primary magnetic" href="#projects">View projects</a>
           <a class="btn magnetic" href="#contact">Get in touch</a>
@@ -42,23 +45,30 @@ export function renderApp({ profile, skills, experience, projects, siteTech }) {
     <section id="experience" class="section" data-scene="experience" data-side="right">
       <div class="content left">
         <p class="eyebrow reveal">Experience</p>
-        <h2 class="reveal">Domains I've shipped in</h2>
+        <h2 class="reveal">Where I've worked</h2>
         <ol class="timeline">
           ${experience
             .map(
               (e) => `
             <li class="reveal" style="--accent:${e.color}">
               <div class="tl-head">
-                <h3>${esc(e.domain)}</h3>
+                <h3>${esc(e.company)}</h3>
                 ${e.current ? '<span class="badge">Current</span>' : ''}
-                ${e.period ? `<span class="period">${esc(e.period)}</span>` : ''}
+                <span class="period">${esc(e.period)}</span>
               </div>
-              <p class="tl-title">${esc(e.title)}${e.company ? ` · ${esc(e.company)}` : ''}</p>
+              <p class="tl-title">${esc(e.title)} · ${esc(e.domain)}</p>
               <ul>${e.highlights.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
+              <div class="tags">${e.stack.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
             </li>`
             )
             .join('')}
         </ol>
+        <div class="edu reveal">
+          <p class="eyebrow">Education</p>
+          <h3>${esc(education.degree)}</h3>
+          <p>${esc(education.school)} · <span class="period">${esc(education.period)}</span></p>
+          <p class="muted">${esc(education.languages)}</p>
+        </div>
       </div>
     </section>
 

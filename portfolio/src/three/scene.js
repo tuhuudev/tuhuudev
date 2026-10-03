@@ -105,7 +105,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
       const side = el.dataset.side === 'left' ? -1 : el.dataset.side === 'right' ? 1 : 0;
       const depth = el.dataset.depth ? Number(el.dataset.depth) : 0;
       obj.group.position.y = -(centerPx - viewport.h / 2) * unitsPerPx;
-      obj.group.position.x = narrow ? 0 : side * vw * 0.23;
+      obj.group.position.x = narrow ? 0 : side * vw * 0.21;
       obj.group.position.z = (narrow ? -5 : 0) + depth;
       // On phones the hero object sits above the headline instead of behind it.
       if (narrow && el.dataset.scene === 'hero') {

@@ -143,13 +143,13 @@ export function createSkillCloud(skills) {
   group.add(cloud);
 
   const items = skills.flatMap((s) => s.items.map((name) => ({ name, group: s.group, color: s.color })));
-  const radius = 2.35;
+  const radius = 2.9;
   const golden = Math.PI * (3 - Math.sqrt(5));
   const labels = items.map((item, i) => {
     const y = 1 - (i / (items.length - 1)) * 2;
     const r = Math.sqrt(1 - y * y);
     const theta = golden * i;
-    const label = createLabel(item.name, { color: item.color, height: 0.36 });
+    const label = createLabel(item.name, { color: item.color, height: 0.3 });
     label.position.set(Math.cos(theta) * r * radius, y * radius, Math.sin(theta) * r * radius);
     label.userData.info = item;
     cloud.add(label);
@@ -188,7 +188,7 @@ export function createSkillCloud(skills) {
   };
 }
 
-// Experience: each domain is a moon orbiting a central star on its own tilted ring.
+// Experience: each company is a moon orbiting a central star on its own tilted ring.
 export function createOrbits(experience) {
   const group = new THREE.Group();
 
@@ -222,7 +222,7 @@ export function createOrbits(experience) {
     );
     pivot.add(moon);
 
-    const label = createLabel(exp.domain, { color: exp.color, height: 0.28 });
+    const label = createLabel(exp.company, { color: exp.color, height: 0.28 });
     group.add(label);
 
     return { moon, label, pivot, radius, speed: 0.35 / (1 + i * 0.5), offset: i * 1.7 };
