@@ -9,6 +9,9 @@
       content="Portfolio of Tu Nguyen (tuhuudev) — Front-end Developer building web products across travel, fintech and crypto."
     />
     <meta name="theme-color" content="#07070d" />
+    <link rel="canonical" href="https://tuhuudev.github.io/tuhuudev/" />
+    <!-- Reveal animations only apply when JS runs; without it the content is simply visible. -->
+    <script>document.documentElement.classList.add('js')</script>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Tu Nguyen — Front-end Developer" />
     <meta property="og:description" content="Interactive 3D portfolio: skills, experience and projects, built with Three.js." />
@@ -25,7 +28,7 @@
   </head>
   <body>
     <canvas id="webgl" aria-hidden="true"></canvas>
-    <div id="tooltip" role="status" aria-live="polite"></div>
+    <div id="tooltip" aria-hidden="true"></div>
 
     <header class="nav">
       <a class="brand" href="#hero">tuhuu<span>.dev</span></a>

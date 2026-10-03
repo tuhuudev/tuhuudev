@@ -259,6 +259,14 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     }
   });
 
+  // If the GPU drops the context (driver reset, too many tabs), fall back to the plain page.
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    running = false;
+    document.body.classList.remove('ready');
+    document.body.classList.add('no-webgl');
+  });
+
   applyTier();
   placeObjects();
   window.addEventListener('resize', queueLayout);

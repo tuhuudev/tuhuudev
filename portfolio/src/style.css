@@ -495,7 +495,7 @@ h3 {
   opacity: 1;
 }
 
-.card.reveal.visible {
+.js .card.reveal.visible {
   transform: perspective(800px) rotateX(var(--rx)) rotateY(var(--ry));
   transition: transform 0.2s ease-out, border-color 0.25s, opacity 0.8s ease;
 }
@@ -645,13 +645,13 @@ footer {
 }
 
 /* ---- Reveal ------------------------------------------------------------------------------- */
-.reveal {
+.js .reveal {
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.reveal.visible {
+.js .reveal.visible {
   opacity: 1;
   transform: none;
 }
@@ -687,7 +687,7 @@ footer {
     animation: none;
   }
 
-  .reveal {
+  .js .reveal {
     transition: none;
     opacity: 1;
     transform: none;
