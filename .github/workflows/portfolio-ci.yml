@@ -1,0 +1,21 @@
+# Build check cho portfolio tren PR (deploy-portfolio.yml chi chay tren main).
+name: Portfolio CI
+
+on:
+  pull_request:
+    paths: ['portfolio/**', '.github/workflows/portfolio-ci.yml']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: portfolio/package-lock.json
+      - run: npm ci
+        working-directory: portfolio
+      - run: npm run build
+        working-directory: portfolio
