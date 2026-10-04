@@ -1,6 +1,6 @@
 # Hi, I'm Tu Nguyen 👋
 
-**Front-end Developer** — building web products across **travel, fintech, and crypto**. Currently exploring applied AI engineering.
+**Front-end Developer** — building web products across **travel, fintech, and e-commerce** (7+ years). Currently exploring applied AI engineering.
 
 Currently building ticketing & booking systems for the travel & hospitality industry: interactive **seat maps with real-time hold/release**, full booking flows (search → checkout → order states), and third-party supplier integrations (KKday, CiAPS) — shipped on both an OTA web platform and a super-app webview.
 

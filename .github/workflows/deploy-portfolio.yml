@@ -5,7 +5,7 @@ name: Deploy portfolio
 # https://tuhuudev.github.io/tuhuudev/
 on:
   push:
-    branches: [main, claude/personal-portfolio-threejs-joqjx4]
+    branches: [main]
     paths: ['portfolio/**', '.github/workflows/deploy-portfolio.yml']
   workflow_dispatch:
 
