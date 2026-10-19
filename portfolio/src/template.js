@@ -139,6 +139,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${profile.links
             .map((l) => `<a class="btn magnetic" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`)
             .join('')}
+          <button class="btn magnetic" type="button" id="print-cv" hidden>Save CV as PDF</button>
         </div>
       </div>
       <footer>© ${new Date().getFullYear()} ${esc(profile.name)} · Built with Three.js</footer>

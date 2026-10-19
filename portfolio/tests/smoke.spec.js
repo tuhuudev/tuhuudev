@@ -20,6 +20,7 @@ test('content is prerendered and readable without JavaScript', async ({ browser 
   for (const p of projects) await expect(page.locator(`a.card[href="${p.url}"]`)).toBeVisible();
   for (const e of experience) await expect(page.locator('.timeline')).toContainText(e.company);
   await expect(page.locator('.skill-group')).toHaveCount(skills.length);
+  await expect(page.locator('#print-cv')).toBeHidden();
   await context.close();
 });
 
@@ -110,4 +111,15 @@ test('print layout hides chrome and shows link targets', async ({ page }) => {
     .first()
     .evaluate((el) => getComputedStyle(el, '::after').content);
   expect(after).toContain(projects[0].url);
+});
+
+test('Save CV button opens the print dialog', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.print = () => (window.__printed = true);
+  });
+  await page.goto('/');
+  const btn = page.locator('#print-cv');
+  await btn.scrollIntoViewIfNeeded();
+  await btn.click();
+  expect(await page.evaluate(() => window.__printed)).toBe(true);
 });

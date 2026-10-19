@@ -148,6 +148,13 @@ function setupCopy() {
   });
 }
 
+// The print stylesheet turns the page into a CV; the button needs JS, so it starts hidden.
+function setupPrint() {
+  const btn = document.getElementById('print-cv');
+  btn.hidden = false;
+  btn.addEventListener('click', () => window.print());
+}
+
 function setupTooltip() {
   const tip = document.getElementById('tooltip');
   let x = 0;
@@ -199,6 +206,7 @@ async function init() {
   setupRoles();
   setupPointerEffects();
   setupCopy();
+  setupPrint();
 
   const scroll = setupScroll();
   const updateNav = setupNav(scroll.getScroll);

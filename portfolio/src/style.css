@@ -315,8 +315,15 @@ h3 {
   background: var(--glass);
   backdrop-filter: blur(8px);
   text-decoration: none;
+  font: inherit;
   font-weight: 500;
+  color: inherit;
+  cursor: pointer;
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s, box-shadow 0.2s;
+}
+
+.btn[hidden] {
+  display: none;
 }
 
 .btn:hover {
@@ -851,6 +858,7 @@ footer {
   .caret,
   #hero .actions,
   .copy,
+  #print-cv,
   #built,
   footer {
     display: none !important;
