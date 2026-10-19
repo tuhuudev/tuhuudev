@@ -74,6 +74,10 @@ test('skip link is the first focusable element', async ({ page, isMobile }) => {
   await page.keyboard.press('Tab');
   await expect(page.locator('.skip-link')).toBeFocused();
   await expect(page.locator('.skip-link')).toBeInViewport();
+  // Activating it skips the nav: the next Tab lands on the first hero button.
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#hero .btn.primary')).toBeFocused();
 });
 
 test('copy email button copies the address', async ({ page, context, browserName }) => {
@@ -122,4 +126,12 @@ test('Save CV button opens the print dialog', async ({ page }) => {
   await btn.scrollIntoViewIfNeeded();
   await btn.click();
   expect(await page.evaluate(() => window.__printed)).toBe(true);
+});
+
+test('social preview image is served', async ({ page, request }) => {
+  await page.goto('/');
+  const url = new URL(await page.locator('meta[property="og:image"]').getAttribute('content'));
+  const res = await request.get(url.pathname.replace(/^\/tuhuudev\//, '/'));
+  expect(res.ok()).toBe(true);
+  expect(res.headers()['content-type']).toMatch(/^image\//);
 });

@@ -26,12 +26,13 @@ const TIERS = [
   { dpr: 0.75, bloom: false },
 ];
 
-// No GPU (SwiftShader, llvmpipe…): every frame is rendered on the CPU, so start at the lowest tier.
+// No GPU (SwiftShader, llvmpipe, Windows' Basic Render Driver…): every frame is rendered on the
+// CPU, so start at the lowest tier.
 function isSoftwareRenderer(renderer) {
   const gl = renderer.getContext();
   const info = gl.getExtension('WEBGL_debug_renderer_info');
   const name = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
-  return /swiftshader|llvmpipe|softpipe|software/i.test(String(name));
+  return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(name));
 }
 
 /**
