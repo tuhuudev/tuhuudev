@@ -6,6 +6,8 @@ Currently building ticketing & booking systems for the travel & hospitality indu
 
 🌌 **3D portfolio:** [tuhuudev.github.io/tuhuudev](https://tuhuudev.github.io/tuhuudev/) — built with Three.js ([source](./portfolio))
 
+[![3D portfolio preview](./portfolio/public/og.jpg)](https://tuhuudev.github.io/tuhuudev/)
+
 ## 🔧 Stack
 
 - **Front-end:** React · Next.js · React Native · Angular · TypeScript
