@@ -50,6 +50,9 @@ test('honors prefers-reduced-motion', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await context.newPage();
   await page.goto('/');
+  // Hero is fully visible immediately (no intro animation).
+  expect(await page.locator('h1').evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+  expect(await page.locator('h1').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
   const role = page.locator('.role-text');
   await expect(role).toHaveText(profile.roles[0]);
   await page.waitForTimeout(3600);
