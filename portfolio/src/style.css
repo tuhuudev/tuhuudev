@@ -724,6 +724,30 @@ footer {
 }
 
 /* ---- Reveal ------------------------------------------------------------------------------- */
+/* Hero lines animate in on first paint with pure CSS, so the headline never waits for JS. */
+.js .intro {
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* The tagline is the largest text block (the LCP element): readable from the first frame, it only slides. */
+.js .lead.intro {
+  animation-name: slide;
+}
+
+@keyframes slide {
+  from {
+    transform: translateY(24px);
+  }
+}
+
 .js .reveal {
   opacity: 0;
   transform: translateY(24px);
@@ -780,7 +804,8 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .caret {
+  .caret,
+  .js .intro {
     animation: none;
   }
 

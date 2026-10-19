@@ -26,6 +26,14 @@ const TIERS = [
   { dpr: 0.75, bloom: false },
 ];
 
+// No GPU (SwiftShader, llvmpipe…): every frame is rendered on the CPU, so start at the lowest tier.
+function isSoftwareRenderer(renderer) {
+  const gl = renderer.getContext();
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  const name = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+  return /swiftshader|llvmpipe|softpipe|software/i.test(String(name));
+}
+
 /**
  * One fixed full-screen canvas behind the page. Each page section owns a 3D object placed at the
  * world height matching the section's position, so the camera moves through the scene 1:1 with
@@ -64,7 +72,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
 
   // Keys match the data-scene attribute of each <section>.
   const sections = {
-    hero: createCore(),
+    hero: createCore({ detail: isMobile ? 32 : 48 }),
     skills: createSkillCloud(data.skills),
     experience: createOrbits(data.experience),
     projects: createProjectShapes(data.projects),
@@ -134,6 +142,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
   const maxDpr = Math.min(window.devicePixelRatio, 2);
   let tier = Math.max(0, TIERS.findIndex((t) => t.dpr <= maxDpr));
   if (isMobile) tier = Math.max(tier, 2);
+  if (isSoftwareRenderer(renderer)) tier = TIERS.length - 1;
 
   function applyTier() {
     const t = TIERS[tier];
@@ -155,7 +164,8 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     sampleTime = 0;
     sampleFrames = 0;
     if (avg > 1 / 45 && tier < TIERS.length - 1) {
-      tier++;
+      // Far too slow (< 20fps): skip a tier instead of spending another 2s sampling.
+      tier = Math.min(TIERS.length - 1, tier + (avg > 1 / 20 ? 2 : 1));
       applyTier();
     }
   }

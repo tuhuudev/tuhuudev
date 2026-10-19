@@ -21,6 +21,8 @@ export default defineConfig({
   base: './',
   plugins: [prerender()],
   build: {
+    // Keep fonts as separate files: the browser fetches only the unicode-range subsets it needs.
+    assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
     // Three.js is lazy-loaded in its own chunk; it is expected to be large.
     chunkSizeWarningLimit: 700,
   },

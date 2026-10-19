@@ -1,3 +1,9 @@
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/600.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
 import './style.css';
 import Lenis from 'lenis';
 import { profile, skills, experience, education, projects, siteTech } from './data.js';
@@ -200,8 +206,19 @@ async function init() {
   }
 
   // Page is readable now; fetch Three.js (separate chunk) and the web font in parallel.
-  const fontReady = Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]);
-  const [{ createWorld }] = await Promise.all([import('./three/scene.js'), fontReady]);
+  // 3D labels are drawn to canvas, so they need the label font loaded first.
+  const fontReady = Promise.race([
+    document.fonts.load('600 64px "Space Grotesk"'),
+    new Promise((r) => setTimeout(r, 1500)),
+  ]);
+  // Building the scene (geometry, shaders) is the heaviest main-thread work, so start it once the
+  // page has loaded and the browser is idle; the chunk itself downloads in the meantime.
+  const idle = new Promise((r) => {
+    const go = () => (window.requestIdleCallback ? requestIdleCallback(r, { timeout: 1000 }) : setTimeout(r, 200));
+    if (document.readyState === 'complete') go();
+    else window.addEventListener('load', go, { once: true });
+  });
+  const [{ createWorld }] = await Promise.all([import('./three/scene.js'), fontReady, idle]);
 
   const world = createWorld(document.getElementById('webgl'), { skills, experience, projects }, {
     reducedMotion,

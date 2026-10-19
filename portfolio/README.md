@@ -21,6 +21,9 @@ the world height matching that section, so scrolling moves the camera through th
 - **Half-resolution bloom**, no MSAA, fewer particles on mobile, off-screen scene culling.
 - Raycasting only when the pointer or scroll changed; frame-rate independent easing everywhere.
 - Rendering pauses when the tab is hidden.
+- Self-hosted fonts (`@fontsource`, unicode-range subsets) — no render-blocking third-party CSS.
+- Hero text animates in with pure CSS on first paint; the 3D scene is built once the page is idle.
+- Software renderers (no GPU) start at the lowest quality tier.
 
 ## Interaction
 

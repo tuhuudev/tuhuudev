@@ -40,7 +40,8 @@ export function createStarfield(count = 2200) {
 }
 
 // Hero: a noise-displaced energy core wrapped in a wireframe shell.
-export function createCore() {
+// `detail` sets the icosphere subdivision; the vertex shader runs noise twice per vertex.
+export function createCore({ detail = 48 } = {}) {
   const group = new THREE.Group();
 
   const uniforms = {
@@ -85,7 +86,7 @@ export function createCore() {
       }
     `,
   });
-  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, 64), material);
+  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, detail), material);
   group.add(core);
 
   const shell = new THREE.Mesh(

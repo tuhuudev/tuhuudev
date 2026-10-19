@@ -29,14 +29,14 @@ export function renderApp({ profile, skills, experience, education, projects, si
   return `
     <section id="hero" class="section" data-scene="hero" data-side="right">
       <div class="content left">
-        <p class="eyebrow reveal">Hi, I'm</p>
-        <h1 class="reveal">${esc(profile.name)}</h1>
-        <p class="role reveal"><span class="role-text">${esc(profile.roles[0])}</span><span class="caret" aria-hidden="true"></span></p>
-        <p class="lead reveal">${esc(profile.tagline)}</p>
-        <dl class="stats reveal">
+        <p class="eyebrow intro" style="--i:0">Hi, I'm</p>
+        <h1 class="intro" style="--i:1">${esc(profile.name)}</h1>
+        <p class="role intro" style="--i:2"><span class="role-text">${esc(profile.roles[0])}</span><span class="caret" aria-hidden="true"></span></p>
+        <p class="lead intro" style="--i:3">${esc(profile.tagline)}</p>
+        <dl class="stats intro" style="--i:4">
           ${profile.stats.map((s) => `<div><dt>${esc(s.value)}</dt><dd>${esc(s.label)}</dd></div>`).join('')}
         </dl>
-        <div class="actions reveal">
+        <div class="actions intro" style="--i:5">
           <a class="btn primary magnetic" href="#projects">View projects</a>
           <a class="btn magnetic" href="#contact">Get in touch</a>
         </div>
