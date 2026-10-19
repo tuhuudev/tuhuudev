@@ -21,6 +21,8 @@ jobs:
         working-directory: portfolio
       - run: npm run build
         working-directory: portfolio
+      - run: npm run check:size
+        working-directory: portfolio
       - run: npx playwright install --with-deps chromium
         working-directory: portfolio
       - run: npx playwright test
