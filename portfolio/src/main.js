@@ -51,20 +51,35 @@ function setupReveal() {
 }
 
 function setupNav(getScroll) {
-  const links = [...document.querySelectorAll('.nav nav a')];
-  const bar = document.querySelector('.progress');
+  const nav = document.querySelector('.nav');
+  const links = [...nav.querySelectorAll('nav a')];
+  const bar = nav.querySelector('.progress');
   const targets = links.map((a) => document.querySelector(a.getAttribute('href')));
   let active = null;
+  let lastScroll = -1;
+
+  // Section positions only change on resize / reflow; reading them every frame forces layout.
+  let tops = [];
+  let max = 0;
+  const measure = () => {
+    tops = targets.map((t) => (t ? t.offsetTop : Infinity));
+    max = document.documentElement.scrollHeight - window.innerHeight;
+    lastScroll = -1;
+  };
+  measure();
+  window.addEventListener('resize', measure);
+  new ResizeObserver(measure).observe(document.getElementById('app'));
 
   return () => {
     const scroll = getScroll();
-    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (scroll === lastScroll) return;
+    lastScroll = scroll;
     bar.style.transform = `scaleX(${max > 0 ? scroll / max : 0})`;
 
     const probe = scroll + window.innerHeight * 0.4;
     let current = null;
-    targets.forEach((t, i) => {
-      if (t && t.offsetTop <= probe) current = links[i];
+    tops.forEach((top, i) => {
+      if (top <= probe) current = links[i];
     });
     if (current !== active) {
       active?.classList.remove('active');
@@ -73,7 +88,7 @@ function setupNav(getScroll) {
       current?.setAttribute('aria-current', 'location');
       active = current;
     }
-    document.querySelector('.nav').classList.toggle('scrolled', scroll > 40);
+    nav.classList.toggle('scrolled', scroll > 40);
   };
 }
 
