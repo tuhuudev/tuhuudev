@@ -6,6 +6,13 @@ import { createLabel } from './label.js';
 const ease = (dt, rate) => 1 - Math.exp(-dt * rate);
 
 // Every builder returns { group, update(time, ctx) } — `ctx` carries pointer + hover state.
+// Hoverable objects carry `userData.info.key` ("skill:<group>", "exp:<company>", "project:<name>"),
+// matching the data-key of the HTML element they mirror; `ctx.highlighted` is the key the page
+// asked to light up.
+
+// True when something in this section (key prefix) is hovered or highlighted, so the rest dims.
+const sectionActive = (ctx, prefix) =>
+  !!(ctx.highlighted?.startsWith(prefix) || ctx.hovered?.userData.info.key.startsWith(prefix));
 
 export function createStarfield(count = 2200) {
   const positions = new Float32Array(count * 3);
@@ -149,7 +156,9 @@ export function createSkillCloud(skills) {
   const cloud = new THREE.Group();
   group.add(cloud);
 
-  const items = skills.flatMap((s) => s.items.map((name) => ({ name, group: s.group, color: s.color })));
+  const items = skills.flatMap((s) =>
+    s.items.map((name) => ({ name, group: s.group, color: s.color, key: `skill:${s.group}` }))
+  );
   const radius = 2.9;
   const golden = Math.PI * (3 - Math.sqrt(5));
   const labels = items.map((item, i) => {
@@ -178,12 +187,12 @@ export function createSkillCloud(skills) {
       cloud.rotation.y = t * 0.12 + ctx.pointer.x * 0.6;
       cloud.rotation.x = ctx.pointer.y * 0.3;
       cloud.updateMatrix();
+      const active = sectionActive(ctx, 'skill:');
       for (const label of labels) {
         const hovered = ctx.hovered === label;
-        const inGroup = ctx.highlightedGroup === label.userData.info.group;
+        const inGroup = ctx.highlighted === label.userData.info.key;
         const focus = hovered || inGroup;
-        const skillHovered = ctx.hovered && !ctx.hovered.userData.info.url;
-        const dimmed = (skillHovered || ctx.highlightedGroup) && !focus;
+        const dimmed = active && !focus;
         const k = hovered ? 1.4 : inGroup ? 1.2 : 1;
         label.scale.lerp(tmpScale.copy(label.userData.baseScale).multiplyScalar(k), ease(ctx.dt, 10));
         // Fade labels on the far side of the sphere so the front reads clearly.
@@ -196,7 +205,7 @@ export function createSkillCloud(skills) {
   };
 }
 
-// Experience: each company is a moon orbiting a central star on its own tilted ring.
+// Experience: each company is a moon orbiting a central star on its own tilted ring. Labels are hoverable.
 export function createOrbits(experience) {
   const group = new THREE.Group();
 
@@ -231,17 +240,33 @@ export function createOrbits(experience) {
     pivot.add(moon);
 
     const label = createLabel(exp.company, { color: exp.color, height: 0.28 });
+    label.userData.info = {
+      name: exp.company,
+      group: `${exp.title} · ${exp.period}`,
+      color: exp.color,
+      key: `exp:${exp.company}`,
+    };
     group.add(label);
 
-    return { moon, label, pivot, radius, speed: 0.35 / (1 + i * 0.5), offset: i * 1.7 };
+    return { moon, label, ring, pivot, radius, speed: 0.35 / (1 + i * 0.5), offset: i * 1.7 };
   });
 
   const tmp = new THREE.Vector3();
+  const tmpScale = new THREE.Vector3();
   return {
     group,
+    hoverables: moons.map((m) => m.label),
     update(t, ctx) {
       halo.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
+      const active = sectionActive(ctx, 'exp:');
       for (const m of moons) {
+        const focus = ctx.hovered === m.label || ctx.highlighted === m.label.userData.info.key;
+        const dimmed = active && !focus;
+        const k = ease(ctx.dt, 8);
+        m.moon.scale.lerp(tmpScale.setScalar(focus ? 1.8 : 1), k);
+        m.label.scale.lerp(tmpScale.copy(m.label.userData.baseScale).multiplyScalar(focus ? 1.25 : 1), k);
+        m.ring.material.opacity += ((focus ? 1 : dimmed ? 0.12 : 0.5) - m.ring.material.opacity) * k;
+        m.label.material.opacity += ((dimmed ? 0.35 : 1) - m.label.material.opacity) * k;
         const a = t * m.speed + m.offset;
         m.moon.position.set(Math.cos(a) * m.radius, Math.sin(a) * m.radius, 0);
         m.moon.getWorldPosition(tmp);
@@ -292,13 +317,13 @@ export function createProjectShapes(projects) {
     );
     wire.scale.setScalar(1.25);
     holder.add(solid, wire);
-    solid.userData.info = { name: p.name, group: p.tags.join(' · '), color, url: p.url };
+    solid.userData.info = { name: p.name, group: p.tags.join(' · '), color, url: p.url, key: `project:${p.name}` };
 
     const label = createLabel(p.name, { color, height: 0.26 });
     label.position.y = -0.9;
     holder.add(label);
 
-    return { holder, solid, wire, name: p.name, phase: i * 1.3 };
+    return { holder, solid, wire, phase: i * 1.3 };
   });
 
   const tmpScale = new THREE.Vector3();
@@ -306,9 +331,10 @@ export function createProjectShapes(projects) {
     group,
     hoverables: shapes.map((s) => s.solid),
     update(t, ctx) {
+      const active = sectionActive(ctx, 'project:');
       for (const s of shapes) {
-        const focus = ctx.hovered === s.solid || ctx.highlightedProject === s.name;
-        const dimmed = (ctx.hovered?.userData.info.url || ctx.highlightedProject) && !focus;
+        const focus = ctx.hovered === s.solid || ctx.highlighted === s.solid.userData.info.key;
+        const dimmed = active && !focus;
         s.holder.scale.lerp(tmpScale.setScalar(focus ? 1.3 : dimmed ? 0.85 : 1), ease(ctx.dt, 8));
         const glow = focus ? 0.9 : dimmed ? 0.1 : 0.25;
         s.solid.material.emissiveIntensity += (glow - s.solid.material.emissiveIntensity) * ease(ctx.dt, 8);

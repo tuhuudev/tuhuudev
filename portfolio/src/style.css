@@ -419,7 +419,8 @@ h3 {
 }
 
 .skill-group:hover,
-.skill-group:focus-visible {
+.skill-group:focus-visible,
+.skill-group.linked {
   transform: translateY(-3px);
   box-shadow: 0 12px 40px -18px var(--accent);
   border-color: var(--accent);
@@ -477,6 +478,12 @@ h3 {
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 14px var(--accent);
+  transition: transform 0.25s ease;
+}
+
+.timeline > li:hover::before,
+.timeline > li.linked::before {
+  transform: scale(1.5);
 }
 
 .tl-head {

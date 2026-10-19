@@ -179,9 +179,8 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
   let pointerDirty = false;
   const raycaster = new THREE.Raycaster();
   let hovered = null;
-  let highlightedGroup = null;
-  let highlightedProject = null;
-  const hoverTargets = [sections.skills, sections.projects];
+  let highlighted = null;
+  const hoverTargets = [sections.skills, sections.experience, sections.projects];
 
   window.addEventListener(
     'pointermove',
@@ -230,8 +229,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     pointer: pointerSmooth,
     pointerSpeed: 0,
     hovered: null,
-    highlightedGroup: null,
-    highlightedProject: null,
+    highlighted: null,
     intro: 0,
     dt: 0,
   };
@@ -262,8 +260,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
 
     ctx.pointerSpeed = pointerSpeed;
     ctx.hovered = hovered;
-    ctx.highlightedGroup = highlightedGroup;
-    ctx.highlightedProject = highlightedProject;
+    ctx.highlighted = highlighted;
     ctx.intro = 1 - Math.pow(1 - intro, 3); // easeOutCubic
     ctx.dt = dt;
 
@@ -308,11 +305,9 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
 
   return {
     layout: queueLayout,
-    highlightGroup(name) {
-      highlightedGroup = name;
-    },
-    highlightProject(name) {
-      highlightedProject = name;
+    // Light up the 3D object(s) for an HTML item's data-key, or clear with null.
+    highlight(key) {
+      highlighted = key;
     },
   };
 }

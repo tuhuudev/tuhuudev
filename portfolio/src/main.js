@@ -179,12 +179,12 @@ function setupTooltip() {
   };
 }
 
-// Hovering a project shape in 3D also lights up its card.
+// Hovering a 3D object also marks the HTML element with the same data-key.
 function linkHover(showTooltip) {
   let linked = null;
   return (info) => {
     showTooltip(info);
-    const card = info?.url ? document.querySelector(`.card[href="${CSS.escape(info.url)}"]`) : null;
+    const card = info ? document.querySelector(`[data-key="${CSS.escape(info.key)}"]`) : null;
     if (card === linked) return;
     linked?.classList.remove('linked');
     card?.classList.add('linked');
@@ -248,22 +248,14 @@ async function init() {
     onHover: linkHover(setupTooltip()),
   });
 
-  for (const card of document.querySelectorAll('.card[data-project]')) {
-    const on = () => world.highlightProject(card.dataset.project);
-    const off = () => world.highlightProject(null);
-    card.addEventListener('pointerenter', on);
-    card.addEventListener('pointerleave', off);
-    card.addEventListener('focus', on);
-    card.addEventListener('blur', off);
-  }
-
-  for (const card of document.querySelectorAll('.skill-group')) {
-    const on = () => world.highlightGroup(card.dataset.group);
-    const off = () => world.highlightGroup(null);
-    card.addEventListener('pointerenter', on);
-    card.addEventListener('pointerleave', off);
-    card.addEventListener('focus', on);
-    card.addEventListener('blur', off);
+  // Skill groups, timeline entries and project cards light up their 3D counterpart.
+  for (const el of document.querySelectorAll('[data-key]')) {
+    const on = () => world.highlight(el.dataset.key);
+    const off = () => world.highlight(null);
+    el.addEventListener('pointerenter', on);
+    el.addEventListener('pointerleave', off);
+    el.addEventListener('focusin', on);
+    el.addEventListener('focusout', off);
   }
 
   document.body.classList.add('ready');

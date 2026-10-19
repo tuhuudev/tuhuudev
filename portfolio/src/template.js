@@ -53,7 +53,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${skills
             .map(
               (g) => `
-            <div class="skill-group reveal" tabindex="0" data-group="${esc(g.group)}" style="--accent:${g.color}">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:${esc(g.group)}" style="--accent:${g.color}">
               <h3>${esc(g.group)} <span class="count">${g.items.length}</span></h3>
               <ul>${g.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>
             </div>`
@@ -71,7 +71,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${experience
             .map(
               (e) => `
-            <li class="reveal" style="--accent:${e.color}">
+            <li class="reveal" style="--accent:${e.color}" data-key="exp:${esc(e.company)}">
               <div class="tl-head">
                 <h3>${esc(e.company)}</h3>
                 ${e.current ? '<span class="badge">Current</span>' : ''}
@@ -101,7 +101,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${projects
             .map(
               (p) => `
-            <a class="card tilt reveal" href="${esc(p.url)}" target="_blank" rel="noopener" data-project="${esc(p.name)}">
+            <a class="card tilt reveal" href="${esc(p.url)}" target="_blank" rel="noopener" data-key="project:${esc(p.name)}">
               <h3>${esc(p.name)} <span aria-hidden="true">↗</span></h3>
               <p>${esc(p.description)}</p>
               <div class="tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
