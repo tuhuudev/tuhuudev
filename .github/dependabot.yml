@@ -1,0 +1,18 @@
+# Monthly update PRs for the portfolio's npm packages and the GitHub Actions used in CI.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /portfolio
+    schedule:
+      interval: monthly
+    groups:
+      all:
+        patterns: ['*']
+    open-pull-requests-limit: 3
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']
