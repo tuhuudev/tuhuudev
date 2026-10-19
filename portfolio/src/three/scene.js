@@ -179,6 +179,8 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
   const raycaster = new THREE.Raycaster();
   let hovered = null;
   let highlightedGroup = null;
+  let highlightedProject = null;
+  const hoverTargets = [sections.skills, sections.projects];
 
   window.addEventListener(
     'pointermove',
@@ -203,9 +205,10 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     if (!pointerDirty && !scrolled) return;
     pointerDirty = false;
     let next = null;
-    if (sections.skills.group.visible) {
+    const targets = hoverTargets.filter((s) => s.group.visible).flatMap((s) => s.hoverables);
+    if (targets.length) {
       raycaster.setFromCamera(ndc, camera);
-      const hit = raycaster.intersectObjects(sections.skills.hoverables, false)[0];
+      const hit = raycaster.intersectObjects(targets, false)[0];
       next = hit ? hit.object : null;
     }
     if (next !== hovered) {
@@ -222,7 +225,15 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
   let intro = reducedMotion ? 1 : 0;
   let running = true;
   let lastScroll = -1;
-  const ctx = { pointer: pointerSmooth, pointerSpeed: 0, hovered: null, highlightedGroup: null, intro: 0, dt: 0 };
+  const ctx = {
+    pointer: pointerSmooth,
+    pointerSpeed: 0,
+    hovered: null,
+    highlightedGroup: null,
+    highlightedProject: null,
+    intro: 0,
+    dt: 0,
+  };
 
   function frame(now) {
     if (!running) return;
@@ -251,6 +262,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     ctx.pointerSpeed = pointerSpeed;
     ctx.hovered = hovered;
     ctx.highlightedGroup = highlightedGroup;
+    ctx.highlightedProject = highlightedProject;
     ctx.intro = 1 - Math.pow(1 - intro, 3); // easeOutCubic
     ctx.dt = dt;
 
@@ -281,6 +293,12 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     document.body.classList.add('no-webgl');
   });
 
+  // Clicking a project shape opens the project, like its card.
+  canvas.addEventListener('click', () => {
+    const url = hovered?.userData.info.url;
+    if (url) window.open(url, '_blank', 'noopener');
+  });
+
   applyTier();
   placeObjects();
   window.addEventListener('resize', queueLayout);
@@ -291,6 +309,9 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     layout: queueLayout,
     highlightGroup(name) {
       highlightedGroup = name;
+    },
+    highlightProject(name) {
+      highlightedProject = name;
     },
   };
 }

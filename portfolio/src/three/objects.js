@@ -182,7 +182,8 @@ export function createSkillCloud(skills) {
         const hovered = ctx.hovered === label;
         const inGroup = ctx.highlightedGroup === label.userData.info.group;
         const focus = hovered || inGroup;
-        const dimmed = (ctx.hovered || ctx.highlightedGroup) && !focus;
+        const skillHovered = ctx.hovered && !ctx.hovered.userData.info.url;
+        const dimmed = (skillHovered || ctx.highlightedGroup) && !focus;
         const k = hovered ? 1.4 : inGroup ? 1.2 : 1;
         label.scale.lerp(tmpScale.copy(label.userData.baseScale).multiplyScalar(k), ease(ctx.dt, 10));
         // Fade labels on the far side of the sphere so the front reads clearly.
@@ -254,7 +255,7 @@ export function createOrbits(experience) {
   };
 }
 
-// Projects: one floating polyhedron per project.
+// Projects: one floating polyhedron per project. Hoverable; clicking opens the project.
 export function createProjectShapes(projects) {
   const group = new THREE.Group();
   const geometries = [
@@ -291,18 +292,26 @@ export function createProjectShapes(projects) {
     );
     wire.scale.setScalar(1.25);
     holder.add(solid, wire);
+    solid.userData.info = { name: p.name, group: p.tags.join(' · '), color, url: p.url };
 
     const label = createLabel(p.name, { color, height: 0.26 });
     label.position.y = -0.9;
     holder.add(label);
 
-    return { holder, solid, wire, phase: i * 1.3 };
+    return { holder, solid, wire, name: p.name, phase: i * 1.3 };
   });
 
+  const tmpScale = new THREE.Vector3();
   return {
     group,
+    hoverables: shapes.map((s) => s.solid),
     update(t, ctx) {
       for (const s of shapes) {
+        const focus = ctx.hovered === s.solid || ctx.highlightedProject === s.name;
+        const dimmed = (ctx.hovered?.userData.info.url || ctx.highlightedProject) && !focus;
+        s.holder.scale.lerp(tmpScale.setScalar(focus ? 1.3 : dimmed ? 0.85 : 1), ease(ctx.dt, 8));
+        const glow = focus ? 0.9 : dimmed ? 0.1 : 0.25;
+        s.solid.material.emissiveIntensity += (glow - s.solid.material.emissiveIntensity) * ease(ctx.dt, 8);
         s.solid.rotation.x = t * 0.4 + s.phase;
         s.solid.rotation.y = t * 0.6 + s.phase;
         s.wire.rotation.copy(s.solid.rotation);

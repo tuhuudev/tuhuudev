@@ -566,7 +566,8 @@ h3 {
   pointer-events: none;
 }
 
-.card:hover {
+.card:hover,
+.card.linked {
   border-color: var(--accent);
 }
 

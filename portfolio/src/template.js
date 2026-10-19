@@ -101,7 +101,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${projects
             .map(
               (p) => `
-            <a class="card tilt reveal" href="${esc(p.url)}" target="_blank" rel="noopener">
+            <a class="card tilt reveal" href="${esc(p.url)}" target="_blank" rel="noopener" data-project="${esc(p.name)}">
               <h3>${esc(p.name)} <span aria-hidden="true">↗</span></h3>
               <p>${esc(p.description)}</p>
               <div class="tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>

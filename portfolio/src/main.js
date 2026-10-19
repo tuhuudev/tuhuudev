@@ -172,6 +172,19 @@ function setupTooltip() {
   };
 }
 
+// Hovering a project shape in 3D also lights up its card.
+function linkHover(showTooltip) {
+  let linked = null;
+  return (info) => {
+    showTooltip(info);
+    const card = info?.url ? document.querySelector(`.card[href="${CSS.escape(info.url)}"]`) : null;
+    if (card === linked) return;
+    linked?.classList.remove('linked');
+    card?.classList.add('linked');
+    linked = card;
+  };
+}
+
 function webglAvailable() {
   try {
     return !!(window.WebGL2RenderingContext && document.createElement('canvas').getContext('webgl2'));
@@ -224,8 +237,17 @@ async function init() {
     reducedMotion,
     getScroll: scroll.getScroll,
     onFrame: pageFrame,
-    onHover: setupTooltip(),
+    onHover: linkHover(setupTooltip()),
   });
+
+  for (const card of document.querySelectorAll('.card[data-project]')) {
+    const on = () => world.highlightProject(card.dataset.project);
+    const off = () => world.highlightProject(null);
+    card.addEventListener('pointerenter', on);
+    card.addEventListener('pointerleave', off);
+    card.addEventListener('focus', on);
+    card.addEventListener('blur', off);
+  }
 
   for (const card of document.querySelectorAll('.skill-group')) {
     const on = () => world.highlightGroup(card.dataset.group);

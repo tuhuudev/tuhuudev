@@ -28,6 +28,7 @@ the world height matching that section, so scrolling moves the camera through th
 ## Interaction
 
 - Hover a skill group card to light up those skills in the 3D cloud (and vice versa: hover a 3D label for a tooltip).
+- Same for projects: hovering a card lights up its polyhedron, hovering a polyhedron highlights the card; click it to open the project.
 - Intro animation, rotating role text, active-section nav + scroll progress bar.
 - 3D tilt + cursor glare on project cards, magnetic buttons, copy-email button.
 - Honors `prefers-reduced-motion`; plain-HTML fallback without WebGL2.
