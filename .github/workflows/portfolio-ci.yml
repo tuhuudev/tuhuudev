@@ -3,7 +3,7 @@ name: Portfolio CI
 
 on:
   pull_request:
-    paths: ['portfolio/**', '.github/workflows/portfolio-ci.yml']
+    paths: ['portfolio/**', 'README.md', '.github/workflows/portfolio-ci.yml']
 
 jobs:
   build:
@@ -16,6 +16,8 @@ jobs:
           cache: npm
           cache-dependency-path: portfolio/package-lock.json
       - run: npm ci
+        working-directory: portfolio
+      - run: npm run check:readme
         working-directory: portfolio
       - run: npm run build
         working-directory: portfolio

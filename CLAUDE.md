@@ -8,6 +8,7 @@
 - `npm run dev` — local server
 - `npm run build` — must pass before a PR (CI runs it on PRs; `deploy-portfolio.yml` deploys `main` to the `gh-pages` branch)
 - `npm test` — build + Playwright smoke tests (`tests/`, against `vite preview`; also run in PR CI)
+- `npm run check:readme` — verifies the profile `README.md` matches `src/data.js` (PR CI)
 
 ## Layout
 - `src/data.js` — all page content (single source of truth). Edit text here, not in HTML.
