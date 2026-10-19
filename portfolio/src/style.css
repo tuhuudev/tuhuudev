@@ -73,6 +73,10 @@ body.no-webgl {
   background-attachment: fixed;
 }
 
+body.no-webgl #webgl {
+  display: none;
+}
+
 /* ---- Nav ---------------------------------------------------------------------------------- */
 .nav {
   position: fixed;

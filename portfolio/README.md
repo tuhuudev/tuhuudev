@@ -36,6 +36,7 @@ cd portfolio
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # output in dist/
+npm test         # build + Playwright smoke tests (no-JS, no-WebGL, reduced motion, mobile)
 ```
 
 ## Edit content
