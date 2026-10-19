@@ -794,3 +794,142 @@ footer {
     animation: none;
   }
 }
+
+/* ---- Print: the page doubles as a one-file CV ---------------------------------------------- */
+@media print {
+  :root {
+    --bg: #fff;
+    --fg: #111;
+    --muted: #444;
+    --line: #ccc;
+    --glass: transparent;
+    --accent-2: #1f5f8b;
+  }
+
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  body,
+  body.no-webgl {
+    background: #fff;
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+
+  #webgl,
+  #tooltip,
+  .skip-link,
+  .nav,
+  .scroll-hint,
+  .caret,
+  #hero .actions,
+  .copy,
+  #built,
+  footer {
+    display: none !important;
+  }
+
+  .js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .section {
+    min-height: 0;
+    display: block;
+    padding: 0 0 6mm;
+  }
+
+  .content,
+  .content.right,
+  .content.center {
+    width: 100%;
+    margin: 0;
+    text-align: left;
+  }
+
+  * {
+    text-shadow: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  h1 {
+    font-size: 26pt;
+    background: none;
+    color: var(--fg);
+  }
+
+  h2,
+  .eyebrow {
+    break-after: avoid;
+  }
+
+  h2 {
+    font-size: 15pt;
+    margin-bottom: 3mm;
+  }
+
+  .tags span {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+
+  .content.center .lead,
+  .email-row {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .email {
+    font-size: 13pt;
+  }
+
+  .muted {
+    display: none;
+  }
+
+  .edu .muted {
+    display: block;
+  }
+
+  .skill-groups,
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+  }
+
+  .skill-group,
+  .card,
+  .timeline > li {
+    break-inside: avoid;
+    transform: none !important;
+  }
+
+  .card::before {
+    display: none;
+  }
+
+  /* Links can't be clicked on paper, so print where they go. */
+  #contact .actions a::after {
+    content: ' — ' attr(href);
+  }
+
+  .card .card-link::after {
+    content: ' — ' attr(data-href);
+  }
+
+  #contact .actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1mm;
+  }
+
+  #contact .btn {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+}

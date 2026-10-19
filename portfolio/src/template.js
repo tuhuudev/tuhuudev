@@ -105,7 +105,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
               <h3>${esc(p.name)} <span aria-hidden="true">↗</span></h3>
               <p>${esc(p.description)}</p>
               <div class="tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
-              <span class="card-link">${esc(p.linkLabel)}</span>
+              <span class="card-link" data-href="${esc(p.url)}">${esc(p.linkLabel)}</span>
             </a>`
             )
             .join('')}

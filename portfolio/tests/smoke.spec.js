@@ -99,3 +99,15 @@ test('ships valid schema.org Person data', async ({ page }) => {
   expect(ld.name).toBe(profile.fullName);
   expect(ld.sameAs).toEqual(profile.links.map((l) => l.url));
 });
+
+test('print layout hides chrome and shows link targets', async ({ page }) => {
+  await page.goto('/');
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.nav')).toBeHidden();
+  await expect(page.locator('#built')).toBeHidden();
+  const after = await page
+    .locator('.card-link')
+    .first()
+    .evaluate((el) => getComputedStyle(el, '::after').content);
+  expect(after).toContain(projects[0].url);
+});
