@@ -159,12 +159,19 @@ function setupTooltip() {
   const tip = document.getElementById('tooltip');
   let x = 0;
   let y = 0;
+  let size = { w: 0, h: 0 };
+  // Sits below-right of the cursor, flipping to the other side near the viewport edges.
+  const place = () => {
+    const left = x + 16 + size.w > window.innerWidth - 8 ? x - 16 - size.w : x + 16;
+    const top = y + 16 + size.h > window.innerHeight - 8 ? y - 16 - size.h : y + 16;
+    tip.style.transform = `translate(${Math.max(8, left)}px, ${Math.max(8, top)}px)`;
+  };
   window.addEventListener(
     'pointermove',
     (e) => {
       x = e.clientX;
       y = e.clientY;
-      if (tip.classList.contains('show')) tip.style.transform = `translate(${x + 16}px, ${y + 16}px)`;
+      if (tip.classList.contains('show')) place();
     },
     { passive: true }
   );
@@ -174,7 +181,8 @@ function setupTooltip() {
       return;
     }
     tip.innerHTML = `<strong style="color:${info.color}">${esc(info.name)}</strong><span>${esc(info.group)}</span>`;
-    tip.style.transform = `translate(${x + 16}px, ${y + 16}px)`;
+    size = { w: tip.offsetWidth, h: tip.offsetHeight };
+    place();
     tip.classList.add('show');
   };
 }
