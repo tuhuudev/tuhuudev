@@ -16,6 +16,7 @@ export const profile = {
     { value: '3', label: 'domains: travel, fintech, e-commerce' },
   ],
   email: 'nguyenhuutu2898@gmail.com',
+  siteUrl: 'https://tuhuudev.github.io/tuhuudev/',
   links: [
     { label: 'GitHub', url: 'https://github.com/tuhuudev' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/tuhuudev/' },

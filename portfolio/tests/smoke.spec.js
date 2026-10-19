@@ -91,3 +91,11 @@ test('no horizontal overflow', async ({ page }) => {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test('ships valid schema.org Person data', async ({ page }) => {
+  await page.goto('/');
+  const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+  expect(ld['@type']).toBe('Person');
+  expect(ld.name).toBe(profile.fullName);
+  expect(ld.sameAs).toEqual(profile.links.map((l) => l.url));
+});

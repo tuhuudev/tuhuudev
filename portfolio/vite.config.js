@@ -8,8 +8,10 @@ function prerender() {
     apply: 'build',
     async transformIndexHtml(html) {
       const data = await import('./src/data.js');
-      const { renderApp } = await import('./src/template.js');
-      return html.replace('<main id="app"></main>', `<main id="app">${renderApp(data)}</main>`);
+      const { renderApp, renderJsonLd } = await import('./src/template.js');
+      return html
+        .replace('<main id="app"></main>', `<main id="app">${renderApp(data)}</main>`)
+        .replace('</head>', `    ${renderJsonLd(data)}\n  </head>`);
     },
   };
 }

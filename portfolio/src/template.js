@@ -4,6 +4,27 @@
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
+// schema.org Person for search engines, built from the same data as the page.
+export function renderJsonLd({ profile, skills, experience, education }) {
+  const current = experience.find((e) => e.current);
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: profile.fullName,
+    alternateName: [profile.name, profile.handle],
+    jobTitle: profile.role,
+    url: profile.siteUrl,
+    email: `mailto:${profile.email}`,
+    address: { '@type': 'PostalAddress', addressLocality: profile.location },
+    sameAs: profile.links.map((l) => l.url),
+    alumniOf: { '@type': 'CollegeOrUniversity', name: education.school },
+    knowsAbout: skills.flatMap((g) => g.items),
+    ...(current && { worksFor: { '@type': 'Organization', name: current.company } }),
+  };
+  // Escape "<" so no string in the data can close the script tag.
+  return `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`;
+}
+
 export function renderApp({ profile, skills, experience, education, projects, siteTech }) {
   return `
     <section id="hero" class="section" data-scene="hero" data-side="right">
