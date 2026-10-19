@@ -64,6 +64,15 @@ test('nav links scroll to their section and mark it active', async ({ page, isMo
   await link.click();
   await expect(page.locator('#projects h2')).toBeInViewport({ timeout: 5000 });
   await expect(link).toHaveClass(/active/);
+  await expect(link).toHaveAttribute('aria-current', 'location');
+});
+
+test('skip link is the first focusable element', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'keyboard only');
+  await page.goto('/');
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.skip-link')).toBeFocused();
+  await expect(page.locator('.skip-link')).toBeInViewport();
 });
 
 test('copy email button copies the address', async ({ page, context, browserName }) => {
@@ -73,6 +82,7 @@ test('copy email button copies the address', async ({ page, context, browserName
   await btn.scrollIntoViewIfNeeded();
   await btn.click();
   await expect(btn).toHaveText(/Copied|Selected/);
+  await expect(page.locator('#copy-status')).toHaveText(/copied|selected/);
   if (browserName === 'chromium') expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(profile.email);
 });
 

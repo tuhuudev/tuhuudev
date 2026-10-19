@@ -46,6 +46,7 @@ export function createCore() {
   const uniforms = {
     uTime: { value: 0 },
     uIntensity: { value: 0.35 },
+    uBrightness: { value: 1 },
     uColorA: { value: new THREE.Color('#5b3cff') },
     uColorB: { value: new THREE.Color('#4fd1ff') },
   };
@@ -72,13 +73,14 @@ export function createCore() {
     fragmentShader: /* glsl */ `
       uniform vec3 uColorA;
       uniform vec3 uColorB;
+      uniform float uBrightness;
       varying float vNoise;
       varying vec3 vNormal;
       varying vec3 vView;
       void main() {
         float fresnel = pow(1.0 - max(dot(vNormal, vView), 0.0), 2.5);
         vec3 col = mix(uColorA, uColorB, smoothstep(-0.6, 0.9, vNoise));
-        col = col * 0.6 + fresnel * vec3(0.55, 0.6, 0.8);
+        col = (col * 0.6 + fresnel * vec3(0.55, 0.6, 0.8)) * uBrightness;
         gl_FragColor = vec4(col, 1.0);
       }
     `,
@@ -117,14 +119,17 @@ export function createCore() {
   ring.rotation.z = -0.2;
   group.add(ring);
 
-  return {
+  // `fit` is set by the layout: < 1 shrinks and dims the core (small screens).
+  const api = {
     group,
+    fit: 1,
     update(t, ctx) {
       uniforms.uTime.value = t;
       // Moving the mouse fast "excites" the core; the intro starts it highly distorted.
       const target = 0.35 + ctx.pointerSpeed * 0.6 + (1 - ctx.intro) * 1.2;
       uniforms.uIntensity.value += (target - uniforms.uIntensity.value) * ease(ctx.dt, 3);
-      group.scale.setScalar(0.4 + 0.6 * ctx.intro);
+      group.scale.setScalar((0.4 + 0.6 * ctx.intro) * (api.fit ?? 1));
+      uniforms.uBrightness.value = api.fit ?? 1;
       ring.rotation.x = 0.45 + (1 - ctx.intro) * 1.2;
       core.rotation.y = t * 0.15;
       shell.rotation.y = -t * 0.1;
@@ -134,6 +139,7 @@ export function createCore() {
       group.rotation.y += (ctx.pointer.x * 0.35 - group.rotation.y) * ease(ctx.dt, 3);
     },
   };
+  return api;
 }
 
 // Skills: labels on a Fibonacci sphere, colored by group. Hoverable.

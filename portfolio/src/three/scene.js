@@ -107,10 +107,14 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
       obj.group.position.y = -(centerPx - viewport.h / 2) * unitsPerPx;
       obj.group.position.x = narrow ? 0 : side * vw * 0.21;
       obj.group.position.z = (narrow ? -5 : 0) + depth;
-      // On phones the hero object sits above the headline instead of behind it.
+      obj.fit = 1;
+      // On phones the headline fills the screen, so the hero core moves to the top-right corner,
+      // smaller and dimmer, where it frames the name instead of washing it out.
       if (narrow && el.dataset.scene === 'hero') {
-        obj.group.position.y += VISIBLE_H * 0.3;
+        obj.group.position.x = vw * 0.34;
+        obj.group.position.y += VISIBLE_H * 0.36;
         obj.group.position.z = -2;
+        obj.fit = 0.62;
       }
     }
   }

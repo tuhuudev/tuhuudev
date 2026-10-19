@@ -10,7 +10,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
       <div class="content left">
         <p class="eyebrow reveal">Hi, I'm</p>
         <h1 class="reveal">${esc(profile.name)}</h1>
-        <p class="role reveal"><span class="role-text" aria-live="polite">${esc(profile.roles[0])}</span><span class="caret" aria-hidden="true"></span></p>
+        <p class="role reveal"><span class="role-text">${esc(profile.roles[0])}</span><span class="caret" aria-hidden="true"></span></p>
         <p class="lead reveal">${esc(profile.tagline)}</p>
         <dl class="stats reveal">
           ${profile.stats.map((s) => `<div><dt>${esc(s.value)}</dt><dd>${esc(s.label)}</dd></div>`).join('')}
@@ -112,6 +112,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
         <div class="email-row reveal">
           <a class="email" href="mailto:${esc(profile.email)}">${esc(profile.email)}</a>
           <button class="copy" type="button" id="copy-email">Copy</button>
+          <span class="sr-only" role="status" id="copy-status"></span>
         </div>
         <div class="actions reveal">
           ${profile.links

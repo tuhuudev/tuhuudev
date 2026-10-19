@@ -62,7 +62,9 @@ function setupNav(getScroll) {
     });
     if (current !== active) {
       active?.classList.remove('active');
+      active?.removeAttribute('aria-current');
       current?.classList.add('active');
+      current?.setAttribute('aria-current', 'location');
       active = current;
     }
     document.querySelector('.nav').classList.toggle('scrolled', scroll > 40);
@@ -119,18 +121,24 @@ function setupPointerEffects() {
 
 function setupCopy() {
   const btn = document.getElementById('copy-email');
+  const status = document.getElementById('copy-status');
   btn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(profile.email);
       btn.textContent = 'Copied';
+      status.textContent = 'Email address copied to clipboard';
     } catch {
       const range = document.createRange();
       range.selectNodeContents(document.querySelector('.email'));
       getSelection().removeAllRanges();
       getSelection().addRange(range);
       btn.textContent = 'Selected';
+      status.textContent = 'Email address selected';
     }
-    setTimeout(() => (btn.textContent = 'Copy'), 1800);
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      status.textContent = '';
+    }, 1800);
   });
 }
 
