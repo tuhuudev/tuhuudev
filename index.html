@@ -15,20 +15,18 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Tu Nguyen — Frontend Developer" />
     <meta property="og:description" content="Interactive 3D portfolio: skills, experience and projects, built with Three.js." />
-    <meta property="og:image" content="https://tuhuudev.github.io/tuhuudev/og.png" />
+    <meta property="og:image" content="https://tuhuudev.github.io/tuhuudev/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://tuhuudev.github.io/tuhuudev/" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%238b7bff'/></svg>" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-    <script type="module" crossorigin src="./assets/index-Y0tw4gmr.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-A2h0BF8y.css">
+    <script type="module" crossorigin src="./assets/index-B2o8Tt6T.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-TM9kSL5N.css">
+      <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Nguyen Huu Tu","alternateName":["Tu Nguyen","tuhuudev"],"jobTitle":"Frontend Developer","url":"https://tuhuudev.github.io/tuhuudev/","email":"mailto:nguyenhuutu2898@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Ho Chi Minh City, Vietnam"},"sameAs":["https://github.com/tuhuudev","https://www.linkedin.com/in/tuhuudev/"],"alumniOf":{"@type":"CollegeOrUniversity","name":"Industrial University of Ho Chi Minh City"},"knowsAbout":["TypeScript","JavaScript","HTML5","CSS3 / SCSS","React","Next.js","Angular","React Native","Redux Saga","NgRx","Tailwind CSS","Ant Design","Material UI","Kendo UI","Figma handoff","REST","GraphQL","Socket.io","Firebase","Payment gateways","Super-app webview","Node.js","Server Actions","Supabase","PostgreSQL","Spring Boot","Vitest","JUnit 5","Git","Agile / Scrum","Claude Code"],"worksFor":{"@type":"Organization","name":"VinsmartFuture"}}</script>
   </head>
   <body>
+    <a class="skip-link" href="#hero">Skip to content</a>
     <canvas id="webgl" aria-hidden="true"></canvas>
     <div id="tooltip" aria-hidden="true"></div>
 
@@ -46,14 +44,14 @@
     <main id="app">
     <section id="hero" class="section" data-scene="hero" data-side="right">
       <div class="content left">
-        <p class="eyebrow reveal">Hi, I'm</p>
-        <h1 class="reveal">Tu Nguyen</h1>
-        <p class="role reveal"><span class="role-text" aria-live="polite">Frontend Developer</span><span class="caret" aria-hidden="true"></span></p>
-        <p class="lead reveal">7+ years building web and mobile products across travel, fintech and e-commerce. Currently shipping ticketing &amp; booking systems at VinsmartFuture.</p>
-        <dl class="stats reveal">
+        <p class="eyebrow intro" style="--i:0">Hi, I'm</p>
+        <h1 class="intro" style="--i:1">Tu Nguyen</h1>
+        <p class="role intro" style="--i:2"><span class="role-text">Frontend Developer</span><span class="caret" aria-hidden="true"></span></p>
+        <p class="lead intro" style="--i:3">7+ years building web and mobile products across travel, fintech and e-commerce. Currently shipping ticketing &amp; booking systems at VinsmartFuture.</p>
+        <dl class="stats intro" style="--i:4">
           <div><dt>7+</dt><dd>years experience</dd></div><div><dt>4</dt><dd>companies</dd></div><div><dt>3</dt><dd>domains: travel, fintech, e-commerce</dd></div>
         </dl>
-        <div class="actions reveal">
+        <div class="actions intro" style="--i:5">
           <a class="btn primary magnetic" href="#projects">View projects</a>
           <a class="btn magnetic" href="#contact">Get in touch</a>
         </div>
@@ -68,27 +66,27 @@
         <p class="muted reveal">Hover a group to light it up in the 3D cloud, or hover the cloud itself.</p>
         <div class="skill-groups">
           
-            <div class="skill-group reveal" tabindex="0" data-group="Core" style="--accent:#8b7bff">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:Core" style="--accent:#8b7bff">
               <h3>Core <span class="count">4</span></h3>
               <ul><li>TypeScript</li><li>JavaScript</li><li>HTML5</li><li>CSS3 / SCSS</li></ul>
             </div>
-            <div class="skill-group reveal" tabindex="0" data-group="Frameworks &amp; state" style="--accent:#4fd1ff">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:Frameworks &amp; state" style="--accent:#4fd1ff">
               <h3>Frameworks &amp; state <span class="count">6</span></h3>
               <ul><li>React</li><li>Next.js</li><li>Angular</li><li>React Native</li><li>Redux Saga</li><li>NgRx</li></ul>
             </div>
-            <div class="skill-group reveal" tabindex="0" data-group="UI" style="--accent:#ff9f6b">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:UI" style="--accent:#ff9f6b">
               <h3>UI <span class="count">5</span></h3>
               <ul><li>Tailwind CSS</li><li>Ant Design</li><li>Material UI</li><li>Kendo UI</li><li>Figma handoff</li></ul>
             </div>
-            <div class="skill-group reveal" tabindex="0" data-group="Integration" style="--accent:#ff7ab6">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:Integration" style="--accent:#ff7ab6">
               <h3>Integration <span class="count">6</span></h3>
               <ul><li>REST</li><li>GraphQL</li><li>Socket.io</li><li>Firebase</li><li>Payment gateways</li><li>Super-app webview</li></ul>
             </div>
-            <div class="skill-group reveal" tabindex="0" data-group="Back-end" style="--accent:#5cffb1">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:Back-end" style="--accent:#5cffb1">
               <h3>Back-end <span class="count">5</span></h3>
               <ul><li>Node.js</li><li>Server Actions</li><li>Supabase</li><li>PostgreSQL</li><li>Spring Boot</li></ul>
             </div>
-            <div class="skill-group reveal" tabindex="0" data-group="Testing &amp; workflow" style="--accent:#ffcf5c">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:Testing &amp; workflow" style="--accent:#ffcf5c">
               <h3>Testing &amp; workflow <span class="count">5</span></h3>
               <ul><li>Vitest</li><li>JUnit 5</li><li>Git</li><li>Agile / Scrum</li><li>Claude Code</li></ul>
             </div>
@@ -102,7 +100,7 @@
         <h2 class="reveal">Where I've worked</h2>
         <ol class="timeline">
           
-            <li class="reveal" style="--accent:#8b7bff">
+            <li class="reveal" style="--accent:#8b7bff" data-key="exp:VinsmartFuture">
               <div class="tl-head">
                 <h3>VinsmartFuture</h3>
                 <span class="badge">Current</span>
@@ -112,7 +110,7 @@
               <ul><li>Built the VinWonders ticketing &amp; booking product on an OTA web platform and as a webview module in the V-App super app</li><li>Interactive event seat map with real-time seat hold / release and availability</li><li>Full booking flow: search → checkout across multiple payment providers → order states (pending / confirmed / cancelled / refunded)</li><li>Integrated third-party travel suppliers KKday and CiAPS</li></ul>
               <div class="tags"><span>React</span><span>Next.js</span><span>TypeScript</span><span>Redux</span></div>
             </li>
-            <li class="reveal" style="--accent:#4fd1ff">
+            <li class="reveal" style="--accent:#4fd1ff" data-key="exp:MetacrewVN">
               <div class="tl-head">
                 <h3>MetacrewVN</h3>
                 
@@ -122,7 +120,7 @@
               <ul><li>Built e-commerce platforms, landing pages, Korean social-network sites and CMS / admin portals for the Korean parent company</li><li>Requirement analysis, screen planning and animation specs; Figma to responsive production UI</li></ul>
               <div class="tags"><span>Next.js</span><span>React</span><span>TypeScript</span><span>Tailwind</span><span>Ant Design</span></div>
             </li>
-            <li class="reveal" style="--accent:#ffcf5c">
+            <li class="reveal" style="--accent:#ffcf5c" data-key="exp:VietMoney">
               <div class="tl-head">
                 <h3>VietMoney</h3>
                 
@@ -132,7 +130,7 @@
               <ul><li>End-to-end pawn-loan contract workflow: request → review → asset appraisal → accounting approval → disbursement, incl. warehouse check-in / check-out</li><li>React Native apps for customers and branch staff, plus a web CMS for head office</li></ul>
               <div class="tags"><span>React Native</span><span>Angular</span><span>TypeScript</span></div>
             </li>
-            <li class="reveal" style="--accent:#5cffb1">
+            <li class="reveal" style="--accent:#5cffb1" data-key="exp:MSX">
               <div class="tl-head">
                 <h3>MSX</h3>
                 
@@ -158,29 +156,29 @@
         <h2 class="reveal">Featured work</h2>
         <div class="cards">
           
-            <a class="card tilt reveal" href="https://github.com/tuhuudev/mega-shop" target="_blank" rel="noopener">
+            <a class="card tilt reveal" href="https://github.com/tuhuudev/mega-shop" target="_blank" rel="noopener" data-key="project:mega-shop">
               <h3>mega-shop <span aria-hidden="true">↗</span></h3>
               <p>Full-stack e-commerce on Next.js 15 + Supabase (PostgreSQL, Auth) with VNPay payments; server actions for cart &amp; checkout, unit-tested payment flows.</p>
               <div class="tags"><span>Next.js 15</span><span>Supabase</span><span>VNPay</span></div>
-              <span class="card-link">Source</span>
+              <span class="card-link" data-href="https://github.com/tuhuudev/mega-shop">Source</span>
             </a>
-            <a class="card tilt reveal" href="https://github.com/tuhuudev/shop-api" target="_blank" rel="noopener">
+            <a class="card tilt reveal" href="https://github.com/tuhuudev/shop-api" target="_blank" rel="noopener" data-key="project:shop-api">
               <h3>shop-api <span aria-hidden="true">↗</span></h3>
               <p>E-commerce REST API in Spring Boot: JWT with refresh tokens, role-based access, order-concurrency handling, JUnit / MockMvc tests.</p>
               <div class="tags"><span>Spring Boot</span><span>JWT</span><span>JUnit</span></div>
-              <span class="card-link">Source</span>
+              <span class="card-link" data-href="https://github.com/tuhuudev/shop-api">Source</span>
             </a>
-            <a class="card tilt reveal" href="https://ai-stack-builder.pages.dev" target="_blank" rel="noopener">
+            <a class="card tilt reveal" href="https://ai-stack-builder.pages.dev" target="_blank" rel="noopener" data-key="project:AI Stack Builder">
               <h3>AI Stack Builder <span aria-hidden="true">↗</span></h3>
               <p>Interactive AI-tool recommender quiz for small businesses.</p>
               <div class="tags"><span>Astro</span><span>Cloudflare Pages</span></div>
-              <span class="card-link">Live site</span>
+              <span class="card-link" data-href="https://ai-stack-builder.pages.dev">Live site</span>
             </a>
-            <a class="card tilt reveal" href="https://ai-model-radar.pages.dev" target="_blank" rel="noopener">
+            <a class="card tilt reveal" href="https://ai-model-radar.pages.dev" target="_blank" rel="noopener" data-key="project:AI Model Radar">
               <h3>AI Model Radar <span aria-hidden="true">↗</span></h3>
               <p>AI model pricing &amp; limits tracker with 500+ pages generated from structured data.</p>
               <div class="tags"><span>SSG</span><span>500+ pages</span></div>
-              <span class="card-link">Live site</span>
+              <span class="card-link" data-href="https://ai-model-radar.pages.dev">Live site</span>
             </a>
         </div>
       </div>
@@ -191,7 +189,7 @@
         <p class="eyebrow reveal">Under the hood</p>
         <h2 class="reveal">How this site is built</h2>
         <ul class="tech-grid">
-          <li class="reveal"><strong>Custom GLSL shaders</strong><span>Simplex-noise vertex displacement and fresnel shading on the hero core</span></li><li class="reveal"><strong>Scroll-synced WebGL</strong><span>One fixed canvas; each section owns a 3D scene placed at its exact page position</span></li><li class="reveal"><strong>Adaptive quality</strong><span>Frame-time monitor lowers pixel ratio and turns off bloom on slower devices</span></li><li class="reveal"><strong>Code splitting</strong><span>Page text renders first; Three.js loads in its own chunk afterwards</span></li><li class="reveal"><strong>Smooth scrolling</strong><span>Lenis inertial scroll driven from the same requestAnimationFrame as rendering</span></li><li class="reveal"><strong>Accessible fallbacks</strong><span>Honors prefers-reduced-motion and works without WebGL</span></li>
+          <li class="reveal"><strong>Custom GLSL shaders</strong><span>Simplex-noise vertex displacement and fresnel shading on the hero core</span></li><li class="reveal"><strong>Scroll-synced WebGL</strong><span>One fixed canvas, driven by Lenis smooth scroll in the same frame loop; each section owns a 3D scene at its page position</span></li><li class="reveal"><strong>Linked 3D &amp; HTML</strong><span>Hover a skill group, job or project to light up its 3D twin, and the other way round</span></li><li class="reveal"><strong>Adaptive quality</strong><span>Frame-time monitor lowers pixel ratio and turns off bloom on slower devices</span></li><li class="reveal"><strong>Fast first paint</strong><span>Content is prerendered and paints first; Three.js loads in its own chunk once the page is idle</span></li><li class="reveal"><strong>Accessible fallbacks</strong><span>Works without JS or WebGL, honors prefers-reduced-motion, and prints as a clean CV</span></li>
         </ul>
       </div>
     </section>
@@ -204,9 +202,11 @@
         <div class="email-row reveal">
           <a class="email" href="mailto:nguyenhuutu2898@gmail.com">nguyenhuutu2898@gmail.com</a>
           <button class="copy" type="button" id="copy-email">Copy</button>
+          <span class="sr-only" role="status" id="copy-status"></span>
         </div>
         <div class="actions reveal">
           <a class="btn magnetic" href="https://github.com/tuhuudev" target="_blank" rel="noopener">GitHub</a><a class="btn magnetic" href="https://www.linkedin.com/in/tuhuudev/" target="_blank" rel="noopener">LinkedIn</a>
+          <button class="btn magnetic" type="button" id="print-cv" hidden>Save CV as PDF</button>
         </div>
       </div>
       <footer>© 2026 Tu Nguyen · Built with Three.js</footer>
