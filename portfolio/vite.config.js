@@ -8,8 +8,10 @@ function prerender() {
     apply: 'build',
     async transformIndexHtml(html) {
       const data = await import('./src/data.js');
-      const { renderApp } = await import('./src/template.js');
-      return html.replace('<main id="app"></main>', `<main id="app">${renderApp(data)}</main>`);
+      const { renderApp, renderJsonLd } = await import('./src/template.js');
+      return html
+        .replace('<main id="app"></main>', `<main id="app">${renderApp(data)}</main>`)
+        .replace('</head>', `    ${renderJsonLd(data)}\n  </head>`);
     },
   };
 }
@@ -19,6 +21,8 @@ export default defineConfig({
   base: './',
   plugins: [prerender()],
   build: {
+    // Keep fonts as separate files: the browser fetches only the unicode-range subsets it needs.
+    assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
     // Three.js is lazy-loaded in its own chunk; it is expected to be large.
     chunkSizeWarningLimit: 700,
   },

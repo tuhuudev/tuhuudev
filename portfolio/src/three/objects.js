@@ -6,6 +6,13 @@ import { createLabel } from './label.js';
 const ease = (dt, rate) => 1 - Math.exp(-dt * rate);
 
 // Every builder returns { group, update(time, ctx) } — `ctx` carries pointer + hover state.
+// Hoverable objects carry `userData.info.key` ("skill:<group>", "exp:<company>", "project:<name>"),
+// matching the data-key of the HTML element they mirror; `ctx.highlighted` is the key the page
+// asked to light up.
+
+// True when something in this section (key prefix) is hovered or highlighted, so the rest dims.
+const sectionActive = (ctx, prefix) =>
+  !!(ctx.highlighted?.startsWith(prefix) || ctx.hovered?.userData.info.key.startsWith(prefix));
 
 export function createStarfield(count = 2200) {
   const positions = new Float32Array(count * 3);
@@ -40,12 +47,14 @@ export function createStarfield(count = 2200) {
 }
 
 // Hero: a noise-displaced energy core wrapped in a wireframe shell.
-export function createCore() {
+// `detail` sets the icosphere subdivision; the vertex shader runs noise twice per vertex.
+export function createCore({ detail = 48 } = {}) {
   const group = new THREE.Group();
 
   const uniforms = {
     uTime: { value: 0 },
     uIntensity: { value: 0.35 },
+    uBrightness: { value: 1 },
     uColorA: { value: new THREE.Color('#5b3cff') },
     uColorB: { value: new THREE.Color('#4fd1ff') },
   };
@@ -72,18 +81,19 @@ export function createCore() {
     fragmentShader: /* glsl */ `
       uniform vec3 uColorA;
       uniform vec3 uColorB;
+      uniform float uBrightness;
       varying float vNoise;
       varying vec3 vNormal;
       varying vec3 vView;
       void main() {
         float fresnel = pow(1.0 - max(dot(vNormal, vView), 0.0), 2.5);
         vec3 col = mix(uColorA, uColorB, smoothstep(-0.6, 0.9, vNoise));
-        col = col * 0.6 + fresnel * vec3(0.55, 0.6, 0.8);
+        col = (col * 0.6 + fresnel * vec3(0.55, 0.6, 0.8)) * uBrightness;
         gl_FragColor = vec4(col, 1.0);
       }
     `,
   });
-  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, 64), material);
+  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, detail), material);
   group.add(core);
 
   const shell = new THREE.Mesh(
@@ -117,14 +127,17 @@ export function createCore() {
   ring.rotation.z = -0.2;
   group.add(ring);
 
-  return {
+  // `fit` is set by the layout: < 1 shrinks and dims the core (small screens).
+  const api = {
     group,
+    fit: 1,
     update(t, ctx) {
       uniforms.uTime.value = t;
       // Moving the mouse fast "excites" the core; the intro starts it highly distorted.
       const target = 0.35 + ctx.pointerSpeed * 0.6 + (1 - ctx.intro) * 1.2;
       uniforms.uIntensity.value += (target - uniforms.uIntensity.value) * ease(ctx.dt, 3);
-      group.scale.setScalar(0.4 + 0.6 * ctx.intro);
+      group.scale.setScalar((0.4 + 0.6 * ctx.intro) * (api.fit ?? 1));
+      uniforms.uBrightness.value = api.fit ?? 1;
       ring.rotation.x = 0.45 + (1 - ctx.intro) * 1.2;
       core.rotation.y = t * 0.15;
       shell.rotation.y = -t * 0.1;
@@ -134,6 +147,7 @@ export function createCore() {
       group.rotation.y += (ctx.pointer.x * 0.35 - group.rotation.y) * ease(ctx.dt, 3);
     },
   };
+  return api;
 }
 
 // Skills: labels on a Fibonacci sphere, colored by group. Hoverable.
@@ -142,7 +156,9 @@ export function createSkillCloud(skills) {
   const cloud = new THREE.Group();
   group.add(cloud);
 
-  const items = skills.flatMap((s) => s.items.map((name) => ({ name, group: s.group, color: s.color })));
+  const items = skills.flatMap((s) =>
+    s.items.map((name) => ({ name, group: s.group, color: s.color, key: `skill:${s.group}` }))
+  );
   const radius = 2.9;
   const golden = Math.PI * (3 - Math.sqrt(5));
   const labels = items.map((item, i) => {
@@ -171,11 +187,12 @@ export function createSkillCloud(skills) {
       cloud.rotation.y = t * 0.12 + ctx.pointer.x * 0.6;
       cloud.rotation.x = ctx.pointer.y * 0.3;
       cloud.updateMatrix();
+      const active = sectionActive(ctx, 'skill:');
       for (const label of labels) {
         const hovered = ctx.hovered === label;
-        const inGroup = ctx.highlightedGroup === label.userData.info.group;
+        const inGroup = ctx.highlighted === label.userData.info.key;
         const focus = hovered || inGroup;
-        const dimmed = (ctx.hovered || ctx.highlightedGroup) && !focus;
+        const dimmed = active && !focus;
         const k = hovered ? 1.4 : inGroup ? 1.2 : 1;
         label.scale.lerp(tmpScale.copy(label.userData.baseScale).multiplyScalar(k), ease(ctx.dt, 10));
         // Fade labels on the far side of the sphere so the front reads clearly.
@@ -188,7 +205,7 @@ export function createSkillCloud(skills) {
   };
 }
 
-// Experience: each company is a moon orbiting a central star on its own tilted ring.
+// Experience: each company is a moon orbiting a central star on its own tilted ring. Labels are hoverable.
 export function createOrbits(experience) {
   const group = new THREE.Group();
 
@@ -223,17 +240,33 @@ export function createOrbits(experience) {
     pivot.add(moon);
 
     const label = createLabel(exp.company, { color: exp.color, height: 0.28 });
+    label.userData.info = {
+      name: exp.company,
+      group: `${exp.title} · ${exp.period}`,
+      color: exp.color,
+      key: `exp:${exp.company}`,
+    };
     group.add(label);
 
-    return { moon, label, pivot, radius, speed: 0.35 / (1 + i * 0.5), offset: i * 1.7 };
+    return { moon, label, ring, pivot, radius, speed: 0.35 / (1 + i * 0.5), offset: i * 1.7 };
   });
 
   const tmp = new THREE.Vector3();
+  const tmpScale = new THREE.Vector3();
   return {
     group,
+    hoverables: moons.map((m) => m.label),
     update(t, ctx) {
       halo.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
+      const active = sectionActive(ctx, 'exp:');
       for (const m of moons) {
+        const focus = ctx.hovered === m.label || ctx.highlighted === m.label.userData.info.key;
+        const dimmed = active && !focus;
+        const k = ease(ctx.dt, 8);
+        m.moon.scale.lerp(tmpScale.setScalar(focus ? 1.8 : 1), k);
+        m.label.scale.lerp(tmpScale.copy(m.label.userData.baseScale).multiplyScalar(focus ? 1.25 : 1), k);
+        m.ring.material.opacity += ((focus ? 1 : dimmed ? 0.12 : 0.5) - m.ring.material.opacity) * k;
+        m.label.material.opacity += ((dimmed ? 0.35 : 1) - m.label.material.opacity) * k;
         const a = t * m.speed + m.offset;
         m.moon.position.set(Math.cos(a) * m.radius, Math.sin(a) * m.radius, 0);
         m.moon.getWorldPosition(tmp);
@@ -247,7 +280,7 @@ export function createOrbits(experience) {
   };
 }
 
-// Projects: one floating polyhedron per project.
+// Projects: one floating polyhedron per project. Hoverable; clicking opens the project.
 export function createProjectShapes(projects) {
   const group = new THREE.Group();
   const geometries = [
@@ -284,6 +317,7 @@ export function createProjectShapes(projects) {
     );
     wire.scale.setScalar(1.25);
     holder.add(solid, wire);
+    solid.userData.info = { name: p.name, group: p.tags.join(' · '), color, url: p.url, key: `project:${p.name}` };
 
     const label = createLabel(p.name, { color, height: 0.26 });
     label.position.y = -0.9;
@@ -292,10 +326,18 @@ export function createProjectShapes(projects) {
     return { holder, solid, wire, phase: i * 1.3 };
   });
 
+  const tmpScale = new THREE.Vector3();
   return {
     group,
+    hoverables: shapes.map((s) => s.solid),
     update(t, ctx) {
+      const active = sectionActive(ctx, 'project:');
       for (const s of shapes) {
+        const focus = ctx.hovered === s.solid || ctx.highlighted === s.solid.userData.info.key;
+        const dimmed = active && !focus;
+        s.holder.scale.lerp(tmpScale.setScalar(focus ? 1.3 : dimmed ? 0.85 : 1), ease(ctx.dt, 8));
+        const glow = focus ? 0.9 : dimmed ? 0.1 : 0.25;
+        s.solid.material.emissiveIntensity += (glow - s.solid.material.emissiveIntensity) * ease(ctx.dt, 8);
         s.solid.rotation.x = t * 0.4 + s.phase;
         s.solid.rotation.y = t * 0.6 + s.phase;
         s.wire.rotation.copy(s.solid.rotation);

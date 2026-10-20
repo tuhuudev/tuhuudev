@@ -21,10 +21,15 @@ the world height matching that section, so scrolling moves the camera through th
 - **Half-resolution bloom**, no MSAA, fewer particles on mobile, off-screen scene culling.
 - Raycasting only when the pointer or scroll changed; frame-rate independent easing everywhere.
 - Rendering pauses when the tab is hidden.
+- Self-hosted fonts (`@fontsource`, unicode-range subsets) — no render-blocking third-party CSS.
+- Hero text animates in with pure CSS on first paint; the 3D scene is built once the page is idle.
+- Software renderers (no GPU) start at the lowest quality tier.
 
 ## Interaction
 
 - Hover a skill group card to light up those skills in the 3D cloud (and vice versa: hover a 3D label for a tooltip).
+- Same for experience (timeline entry ↔ moon) and projects (card ↔ polyhedron; click a polyhedron to open the project).
+  HTML items carry `data-key` (`skill:<group>`, `exp:<company>`, `project:<name>`) matching `userData.info.key` in 3D.
 - Intro animation, rotating role text, active-section nav + scroll progress bar.
 - 3D tilt + cursor glare on project cards, magnetic buttons, copy-email button.
 - Honors `prefers-reduced-motion`; plain-HTML fallback without WebGL2.
@@ -36,6 +41,7 @@ cd portfolio
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # output in dist/
+npm test         # build + Playwright smoke tests (no-JS, no-WebGL, reduced motion, mobile)
 ```
 
 ## Edit content

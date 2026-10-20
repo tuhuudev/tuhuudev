@@ -26,6 +26,15 @@ const TIERS = [
   { dpr: 0.75, bloom: false },
 ];
 
+// No GPU (SwiftShader, llvmpipe, Windows' Basic Render Driver…): every frame is rendered on the
+// CPU, so start at the lowest tier.
+function isSoftwareRenderer(renderer) {
+  const gl = renderer.getContext();
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  const name = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+  return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(name));
+}
+
 /**
  * One fixed full-screen canvas behind the page. Each page section owns a 3D object placed at the
  * world height matching the section's position, so the camera moves through the scene 1:1 with
@@ -64,7 +73,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
 
   // Keys match the data-scene attribute of each <section>.
   const sections = {
-    hero: createCore(),
+    hero: createCore({ detail: isMobile ? 32 : 48 }),
     skills: createSkillCloud(data.skills),
     experience: createOrbits(data.experience),
     projects: createProjectShapes(data.projects),
@@ -107,10 +116,14 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
       obj.group.position.y = -(centerPx - viewport.h / 2) * unitsPerPx;
       obj.group.position.x = narrow ? 0 : side * vw * 0.21;
       obj.group.position.z = (narrow ? -5 : 0) + depth;
-      // On phones the hero object sits above the headline instead of behind it.
+      obj.fit = 1;
+      // On phones the headline fills the screen, so the hero core moves to the top-right corner,
+      // smaller and dimmer, where it frames the name instead of washing it out.
       if (narrow && el.dataset.scene === 'hero') {
-        obj.group.position.y += VISIBLE_H * 0.3;
+        obj.group.position.x = vw * 0.34;
+        obj.group.position.y += VISIBLE_H * 0.36;
         obj.group.position.z = -2;
+        obj.fit = 0.62;
       }
     }
   }
@@ -130,6 +143,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
   const maxDpr = Math.min(window.devicePixelRatio, 2);
   let tier = Math.max(0, TIERS.findIndex((t) => t.dpr <= maxDpr));
   if (isMobile) tier = Math.max(tier, 2);
+  if (isSoftwareRenderer(renderer)) tier = TIERS.length - 1;
 
   function applyTier() {
     const t = TIERS[tier];
@@ -151,7 +165,8 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     sampleTime = 0;
     sampleFrames = 0;
     if (avg > 1 / 45 && tier < TIERS.length - 1) {
-      tier++;
+      // Far too slow (< 20fps): skip a tier instead of spending another 2s sampling.
+      tier = Math.min(TIERS.length - 1, tier + (avg > 1 / 20 ? 2 : 1));
       applyTier();
     }
   }
@@ -164,7 +179,8 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
   let pointerDirty = false;
   const raycaster = new THREE.Raycaster();
   let hovered = null;
-  let highlightedGroup = null;
+  let highlighted = null;
+  const hoverTargets = [sections.skills, sections.experience, sections.projects];
 
   window.addEventListener(
     'pointermove',
@@ -189,9 +205,10 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     if (!pointerDirty && !scrolled) return;
     pointerDirty = false;
     let next = null;
-    if (sections.skills.group.visible) {
+    const targets = hoverTargets.filter((s) => s.group.visible).flatMap((s) => s.hoverables);
+    if (targets.length) {
       raycaster.setFromCamera(ndc, camera);
-      const hit = raycaster.intersectObjects(sections.skills.hoverables, false)[0];
+      const hit = raycaster.intersectObjects(targets, false)[0];
       next = hit ? hit.object : null;
     }
     if (next !== hovered) {
@@ -208,7 +225,14 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
   let intro = reducedMotion ? 1 : 0;
   let running = true;
   let lastScroll = -1;
-  const ctx = { pointer: pointerSmooth, pointerSpeed: 0, hovered: null, highlightedGroup: null, intro: 0, dt: 0 };
+  const ctx = {
+    pointer: pointerSmooth,
+    pointerSpeed: 0,
+    hovered: null,
+    highlighted: null,
+    intro: 0,
+    dt: 0,
+  };
 
   function frame(now) {
     if (!running) return;
@@ -236,7 +260,7 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
 
     ctx.pointerSpeed = pointerSpeed;
     ctx.hovered = hovered;
-    ctx.highlightedGroup = highlightedGroup;
+    ctx.highlighted = highlighted;
     ctx.intro = 1 - Math.pow(1 - intro, 3); // easeOutCubic
     ctx.dt = dt;
 
@@ -267,6 +291,12 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
     document.body.classList.add('no-webgl');
   });
 
+  // Clicking a project shape opens the project, like its card.
+  canvas.addEventListener('click', () => {
+    const url = hovered?.userData.info.url;
+    if (url) window.open(url, '_blank', 'noopener');
+  });
+
   applyTier();
   placeObjects();
   window.addEventListener('resize', queueLayout);
@@ -275,8 +305,9 @@ export function createWorld(canvas, data, { reducedMotion = false, getScroll, on
 
   return {
     layout: queueLayout,
-    highlightGroup(name) {
-      highlightedGroup = name;
+    // Light up the 3D object(s) for an HTML item's data-key, or clear with null.
+    highlight(key) {
+      highlighted = key;
     },
   };
 }

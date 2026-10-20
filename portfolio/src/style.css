@@ -35,6 +35,33 @@ html.lenis body {
   outline-offset: 3px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
 body.hovering-3d {
   cursor: pointer;
 }
@@ -71,6 +98,10 @@ body.ready #webgl {
 body.no-webgl {
   background: radial-gradient(circle at 70% 20%, #1d1647, var(--bg) 60%);
   background-attachment: fixed;
+}
+
+body.no-webgl #webgl {
+  display: none;
 }
 
 /* ---- Nav ---------------------------------------------------------------------------------- */
@@ -284,8 +315,15 @@ h3 {
   background: var(--glass);
   backdrop-filter: blur(8px);
   text-decoration: none;
+  font: inherit;
   font-weight: 500;
+  color: inherit;
+  cursor: pointer;
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s, box-shadow 0.2s;
+}
+
+.btn[hidden] {
+  display: none;
 }
 
 .btn:hover {
@@ -381,7 +419,8 @@ h3 {
 }
 
 .skill-group:hover,
-.skill-group:focus-visible {
+.skill-group:focus-visible,
+.skill-group.linked {
   transform: translateY(-3px);
   box-shadow: 0 12px 40px -18px var(--accent);
   border-color: var(--accent);
@@ -439,6 +478,12 @@ h3 {
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 14px var(--accent);
+  transition: transform 0.25s ease;
+}
+
+.timeline > li:hover::before,
+.timeline > li.linked::before {
+  transform: scale(1.5);
 }
 
 .tl-head {
@@ -535,7 +580,8 @@ h3 {
   pointer-events: none;
 }
 
-.card:hover {
+.card:hover,
+.card.linked {
   border-color: var(--accent);
 }
 
@@ -693,6 +739,30 @@ footer {
 }
 
 /* ---- Reveal ------------------------------------------------------------------------------- */
+/* Hero lines animate in on first paint with pure CSS, so the headline never waits for JS. */
+.js .intro {
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* The tagline is the largest text block (the LCP element): readable from the first frame, it only slides. */
+.js .lead.intro {
+  animation-name: slide;
+}
+
+@keyframes slide {
+  from {
+    transform: translateY(24px);
+  }
+}
+
 .js .reveal {
   opacity: 0;
   transform: translateY(24px);
@@ -725,13 +795,32 @@ footer {
     text-shadow: 0 2px 12px rgba(7, 7, 13, 0.9);
   }
 
-  .nav nav a:not(:last-child) {
-    display: none;
+  .nav nav a {
+    font-size: 0.88rem;
+  }
+}
+
+/* Phones: brand on the first row, section links spread across a second row. */
+@media (max-width: 520px) {
+  .nav {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding-top: 12px;
+    padding-bottom: 10px;
+    background: rgba(7, 7, 13, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .nav nav {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .caret {
+  .caret,
+  .js .intro {
     animation: none;
   }
 
@@ -743,5 +832,145 @@ footer {
 
   .scroll-hint span {
     animation: none;
+  }
+}
+
+/* ---- Print: the page doubles as a one-file CV ---------------------------------------------- */
+@media print {
+  :root {
+    --bg: #fff;
+    --fg: #111;
+    --muted: #444;
+    --line: #ccc;
+    --glass: transparent;
+    --accent-2: #1f5f8b;
+  }
+
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  body,
+  body.no-webgl {
+    background: #fff;
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+
+  #webgl,
+  #tooltip,
+  .skip-link,
+  .nav,
+  .scroll-hint,
+  .caret,
+  #hero .actions,
+  .copy,
+  #print-cv,
+  #built,
+  footer {
+    display: none !important;
+  }
+
+  .js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .section {
+    min-height: 0;
+    display: block;
+    padding: 0 0 6mm;
+  }
+
+  .content,
+  .content.right,
+  .content.center {
+    width: 100%;
+    margin: 0;
+    text-align: left;
+  }
+
+  * {
+    text-shadow: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  h1 {
+    font-size: 26pt;
+    background: none;
+    color: var(--fg);
+  }
+
+  h2,
+  .eyebrow {
+    break-after: avoid;
+  }
+
+  h2 {
+    font-size: 15pt;
+    margin-bottom: 3mm;
+  }
+
+  .tags span {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+
+  .content.center .lead,
+  .email-row {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .email {
+    font-size: 13pt;
+  }
+
+  .muted {
+    display: none;
+  }
+
+  .edu .muted {
+    display: block;
+  }
+
+  .skill-groups,
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3mm;
+  }
+
+  .skill-group,
+  .card,
+  .timeline > li {
+    break-inside: avoid;
+    transform: none !important;
+  }
+
+  .card::before {
+    display: none;
+  }
+
+  /* Links can't be clicked on paper, so print where they go. */
+  #contact .actions a::after {
+    content: ' — ' attr(href);
+  }
+
+  .card .card-link::after {
+    content: ' — ' attr(data-href);
+  }
+
+  #contact .actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1mm;
+  }
+
+  #contact .btn {
+    padding: 0;
+    border: 0;
+    background: none;
   }
 }

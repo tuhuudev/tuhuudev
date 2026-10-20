@@ -1,3 +1,9 @@
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/600.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
 import './style.css';
 import Lenis from 'lenis';
 import { profile, skills, experience, education, projects, siteTech } from './data.js';
@@ -45,27 +51,44 @@ function setupReveal() {
 }
 
 function setupNav(getScroll) {
-  const links = [...document.querySelectorAll('.nav nav a')];
-  const bar = document.querySelector('.progress');
+  const nav = document.querySelector('.nav');
+  const links = [...nav.querySelectorAll('nav a')];
+  const bar = nav.querySelector('.progress');
   const targets = links.map((a) => document.querySelector(a.getAttribute('href')));
   let active = null;
+  let lastScroll = -1;
+
+  // Section positions only change on resize / reflow; reading them every frame forces layout.
+  let tops = [];
+  let max = 0;
+  const measure = () => {
+    tops = targets.map((t) => (t ? t.offsetTop : Infinity));
+    max = document.documentElement.scrollHeight - window.innerHeight;
+    lastScroll = -1;
+  };
+  measure();
+  window.addEventListener('resize', measure);
+  new ResizeObserver(measure).observe(document.getElementById('app'));
 
   return () => {
     const scroll = getScroll();
-    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (scroll === lastScroll) return;
+    lastScroll = scroll;
     bar.style.transform = `scaleX(${max > 0 ? scroll / max : 0})`;
 
     const probe = scroll + window.innerHeight * 0.4;
     let current = null;
-    targets.forEach((t, i) => {
-      if (t && t.offsetTop <= probe) current = links[i];
+    tops.forEach((top, i) => {
+      if (top <= probe) current = links[i];
     });
     if (current !== active) {
       active?.classList.remove('active');
+      active?.removeAttribute('aria-current');
       current?.classList.add('active');
+      current?.setAttribute('aria-current', 'location');
       active = current;
     }
-    document.querySelector('.nav').classList.toggle('scrolled', scroll > 40);
+    nav.classList.toggle('scrolled', scroll > 40);
   };
 }
 
@@ -119,31 +142,51 @@ function setupPointerEffects() {
 
 function setupCopy() {
   const btn = document.getElementById('copy-email');
+  const status = document.getElementById('copy-status');
   btn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(profile.email);
       btn.textContent = 'Copied';
+      status.textContent = 'Email address copied to clipboard';
     } catch {
       const range = document.createRange();
       range.selectNodeContents(document.querySelector('.email'));
       getSelection().removeAllRanges();
       getSelection().addRange(range);
       btn.textContent = 'Selected';
+      status.textContent = 'Email address selected';
     }
-    setTimeout(() => (btn.textContent = 'Copy'), 1800);
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      status.textContent = '';
+    }, 1800);
   });
+}
+
+// The print stylesheet turns the page into a CV; the button needs JS, so it starts hidden.
+function setupPrint() {
+  const btn = document.getElementById('print-cv');
+  btn.hidden = false;
+  btn.addEventListener('click', () => window.print());
 }
 
 function setupTooltip() {
   const tip = document.getElementById('tooltip');
   let x = 0;
   let y = 0;
+  let size = { w: 0, h: 0 };
+  // Sits below-right of the cursor, flipping to the other side near the viewport edges.
+  const place = () => {
+    const left = x + 16 + size.w > window.innerWidth - 8 ? x - 16 - size.w : x + 16;
+    const top = y + 16 + size.h > window.innerHeight - 8 ? y - 16 - size.h : y + 16;
+    tip.style.transform = `translate(${Math.max(8, left)}px, ${Math.max(8, top)}px)`;
+  };
   window.addEventListener(
     'pointermove',
     (e) => {
       x = e.clientX;
       y = e.clientY;
-      if (tip.classList.contains('show')) tip.style.transform = `translate(${x + 16}px, ${y + 16}px)`;
+      if (tip.classList.contains('show')) place();
     },
     { passive: true }
   );
@@ -153,8 +196,22 @@ function setupTooltip() {
       return;
     }
     tip.innerHTML = `<strong style="color:${info.color}">${esc(info.name)}</strong><span>${esc(info.group)}</span>`;
-    tip.style.transform = `translate(${x + 16}px, ${y + 16}px)`;
+    size = { w: tip.offsetWidth, h: tip.offsetHeight };
+    place();
     tip.classList.add('show');
+  };
+}
+
+// Hovering a 3D object also marks the HTML element with the same data-key.
+function linkHover(showTooltip) {
+  let linked = null;
+  return (info) => {
+    showTooltip(info);
+    const card = info ? document.querySelector(`[data-key="${CSS.escape(info.key)}"]`) : null;
+    if (card === linked) return;
+    linked?.classList.remove('linked');
+    card?.classList.add('linked');
+    linked = card;
   };
 }
 
@@ -172,6 +229,7 @@ async function init() {
   setupRoles();
   setupPointerEffects();
   setupCopy();
+  setupPrint();
 
   const scroll = setupScroll();
   const updateNav = setupNav(scroll.getScroll);
@@ -192,23 +250,35 @@ async function init() {
   }
 
   // Page is readable now; fetch Three.js (separate chunk) and the web font in parallel.
-  const fontReady = Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]);
-  const [{ createWorld }] = await Promise.all([import('./three/scene.js'), fontReady]);
+  // 3D labels are drawn to canvas, so they need the label font loaded first.
+  const fontReady = Promise.race([
+    document.fonts.load('600 64px "Space Grotesk"'),
+    new Promise((r) => setTimeout(r, 1500)),
+  ]);
+  // Building the scene (geometry, shaders) is the heaviest main-thread work, so start it once the
+  // page has loaded and the browser is idle; the chunk itself downloads in the meantime.
+  const idle = new Promise((r) => {
+    const go = () => (window.requestIdleCallback ? requestIdleCallback(r, { timeout: 1000 }) : setTimeout(r, 200));
+    if (document.readyState === 'complete') go();
+    else window.addEventListener('load', go, { once: true });
+  });
+  const [{ createWorld }] = await Promise.all([import('./three/scene.js'), fontReady, idle]);
 
   const world = createWorld(document.getElementById('webgl'), { skills, experience, projects }, {
     reducedMotion,
     getScroll: scroll.getScroll,
     onFrame: pageFrame,
-    onHover: setupTooltip(),
+    onHover: linkHover(setupTooltip()),
   });
 
-  for (const card of document.querySelectorAll('.skill-group')) {
-    const on = () => world.highlightGroup(card.dataset.group);
-    const off = () => world.highlightGroup(null);
-    card.addEventListener('pointerenter', on);
-    card.addEventListener('pointerleave', off);
-    card.addEventListener('focus', on);
-    card.addEventListener('blur', off);
+  // Skill groups, timeline entries and project cards light up their 3D counterpart.
+  for (const el of document.querySelectorAll('[data-key]')) {
+    const on = () => world.highlight(el.dataset.key);
+    const off = () => world.highlight(null);
+    el.addEventListener('pointerenter', on);
+    el.addEventListener('pointerleave', off);
+    el.addEventListener('focusin', on);
+    el.addEventListener('focusout', off);
   }
 
   document.body.classList.add('ready');

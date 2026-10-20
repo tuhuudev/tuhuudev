@@ -4,18 +4,39 @@
 export const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
+// schema.org Person for search engines, built from the same data as the page.
+export function renderJsonLd({ profile, skills, experience, education }) {
+  const current = experience.find((e) => e.current);
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: profile.fullName,
+    alternateName: [profile.name, profile.handle],
+    jobTitle: profile.role,
+    url: profile.siteUrl,
+    email: `mailto:${profile.email}`,
+    address: { '@type': 'PostalAddress', addressLocality: profile.location },
+    sameAs: profile.links.map((l) => l.url),
+    alumniOf: { '@type': 'CollegeOrUniversity', name: education.school },
+    knowsAbout: skills.flatMap((g) => g.items),
+    ...(current && { worksFor: { '@type': 'Organization', name: current.company } }),
+  };
+  // Escape "<" so no string in the data can close the script tag.
+  return `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`;
+}
+
 export function renderApp({ profile, skills, experience, education, projects, siteTech }) {
   return `
     <section id="hero" class="section" data-scene="hero" data-side="right">
       <div class="content left">
-        <p class="eyebrow reveal">Hi, I'm</p>
-        <h1 class="reveal">${esc(profile.name)}</h1>
-        <p class="role reveal"><span class="role-text" aria-live="polite">${esc(profile.roles[0])}</span><span class="caret" aria-hidden="true"></span></p>
-        <p class="lead reveal">${esc(profile.tagline)}</p>
-        <dl class="stats reveal">
+        <p class="eyebrow intro" style="--i:0">Hi, I'm</p>
+        <h1 class="intro" style="--i:1">${esc(profile.name)}</h1>
+        <p class="role intro" style="--i:2"><span class="role-text">${esc(profile.roles[0])}</span><span class="caret" aria-hidden="true"></span></p>
+        <p class="lead intro" style="--i:3">${esc(profile.tagline)}</p>
+        <dl class="stats intro" style="--i:4">
           ${profile.stats.map((s) => `<div><dt>${esc(s.value)}</dt><dd>${esc(s.label)}</dd></div>`).join('')}
         </dl>
-        <div class="actions reveal">
+        <div class="actions intro" style="--i:5">
           <a class="btn primary magnetic" href="#projects">View projects</a>
           <a class="btn magnetic" href="#contact">Get in touch</a>
         </div>
@@ -32,7 +53,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${skills
             .map(
               (g) => `
-            <div class="skill-group reveal" tabindex="0" data-group="${esc(g.group)}" style="--accent:${g.color}">
+            <div class="skill-group reveal" tabindex="0" data-key="skill:${esc(g.group)}" style="--accent:${g.color}">
               <h3>${esc(g.group)} <span class="count">${g.items.length}</span></h3>
               <ul>${g.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>
             </div>`
@@ -50,7 +71,7 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${experience
             .map(
               (e) => `
-            <li class="reveal" style="--accent:${e.color}">
+            <li class="reveal" style="--accent:${e.color}" data-key="exp:${esc(e.company)}">
               <div class="tl-head">
                 <h3>${esc(e.company)}</h3>
                 ${e.current ? '<span class="badge">Current</span>' : ''}
@@ -80,11 +101,11 @@ export function renderApp({ profile, skills, experience, education, projects, si
           ${projects
             .map(
               (p) => `
-            <a class="card tilt reveal" href="${esc(p.url)}" target="_blank" rel="noopener">
+            <a class="card tilt reveal" href="${esc(p.url)}" target="_blank" rel="noopener" data-key="project:${esc(p.name)}">
               <h3>${esc(p.name)} <span aria-hidden="true">↗</span></h3>
               <p>${esc(p.description)}</p>
               <div class="tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
-              <span class="card-link">${esc(p.linkLabel)}</span>
+              <span class="card-link" data-href="${esc(p.url)}">${esc(p.linkLabel)}</span>
             </a>`
             )
             .join('')}
@@ -112,11 +133,13 @@ export function renderApp({ profile, skills, experience, education, projects, si
         <div class="email-row reveal">
           <a class="email" href="mailto:${esc(profile.email)}">${esc(profile.email)}</a>
           <button class="copy" type="button" id="copy-email">Copy</button>
+          <span class="sr-only" role="status" id="copy-status"></span>
         </div>
         <div class="actions reveal">
           ${profile.links
             .map((l) => `<a class="btn magnetic" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`)
             .join('')}
+          <button class="btn magnetic" type="button" id="print-cv" hidden>Save CV as PDF</button>
         </div>
       </div>
       <footer>© ${new Date().getFullYear()} ${esc(profile.name)} · Built with Three.js</footer>

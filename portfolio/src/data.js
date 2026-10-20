@@ -16,6 +16,7 @@ export const profile = {
     { value: '3', label: 'domains: travel, fintech, e-commerce' },
   ],
   email: 'nguyenhuutu2898@gmail.com',
+  siteUrl: 'https://tuhuudev.github.io/tuhuudev/',
   links: [
     { label: 'GitHub', url: 'https://github.com/tuhuudev' },
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/tuhuudev/' },
@@ -154,9 +155,12 @@ export const projects = [
 // "Under the hood" — the techniques this site itself uses.
 export const siteTech = [
   { name: 'Custom GLSL shaders', detail: 'Simplex-noise vertex displacement and fresnel shading on the hero core' },
-  { name: 'Scroll-synced WebGL', detail: 'One fixed canvas; each section owns a 3D scene placed at its exact page position' },
+  {
+    name: 'Scroll-synced WebGL',
+    detail: 'One fixed canvas, driven by Lenis smooth scroll in the same frame loop; each section owns a 3D scene at its page position',
+  },
+  { name: 'Linked 3D & HTML', detail: 'Hover a skill group, job or project to light up its 3D twin, and the other way round' },
   { name: 'Adaptive quality', detail: 'Frame-time monitor lowers pixel ratio and turns off bloom on slower devices' },
-  { name: 'Code splitting', detail: 'Page text renders first; Three.js loads in its own chunk afterwards' },
-  { name: 'Smooth scrolling', detail: 'Lenis inertial scroll driven from the same requestAnimationFrame as rendering' },
-  { name: 'Accessible fallbacks', detail: 'Honors prefers-reduced-motion and works without WebGL' },
+  { name: 'Fast first paint', detail: 'Content is prerendered and paints first; Three.js loads in its own chunk once the page is idle' },
+  { name: 'Accessible fallbacks', detail: 'Works without JS or WebGL, honors prefers-reduced-motion, and prints as a clean CV' },
 ];
